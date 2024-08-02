@@ -1,5 +1,5 @@
 import React from 'react';
-import Hero from './components/Header.jsx'
+import Hero from './components/Hero.jsx'
 
 
 const App = () => {
