@@ -1,0 +1,18 @@
+.header{
+  display: flex;
+  text-align: center;
+  justify-content: space-between;
+}
+.logo img{
+  width: 100px;
+  height: 80px;
+  margin: 29px 59px;
+  border-radius: 10px;
+}
+.header button{
+  width: 197px;
+  height: 65px;
+  padding: 0;
+  margin-top : 26px;
+  margin-right: 33px;
+}
