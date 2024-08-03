@@ -1,16 +1,20 @@
-.header{
+
+
+.header {
   display: flex;
   text-align: center;
   justify-content: space-between;
   z-index: 10;
 }
-.logo img{
-  width: 80px;
-  height: 70px;
-  margin: 29px 59px;
+
+.logo img {
+  width: 70px;
+  height: 60px;
+  margin: 29px 50px;
   border-radius: 10px;
 }
-.header button{
+
+.about-us {
   width: 121px;
   height: 40px;
   padding: 0;
@@ -18,13 +22,102 @@
   margin-right: 33px;
   border-radius: 35px;
   border: none;
-  transition: 0.3s ;
+  transition: 0.3s;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
   font-size: large;
   font-weight: 500;
 }
 
-.header button:hover {
-  background-color: #9B9B9B;
+.about-us :hover {
+  background-color: #6D6D6D;
 }
 
+.heading-upper {
+  margin-left: 70px;
+  margin-top: 100px;
+}
+
+.heading-upper span {
+  font-weight: 800;
+}
+
+.hero h1 {
+  margin-left: 70px;
+  margin-top: 40px;
+}
+
+.button-start {
+  width: 121px;
+  height: 50px;
+  padding: 0;
+  margin-top: 70px;
+  border-radius: 10px;
+  border: none;
+  transition: 0.3s;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+  font-size: large;
+  font-weight: 500;
+  background-color: #ffffff; /* Add a default background color */
+  color: #000000; /* Add a default text color */
+  cursor: pointer; /* Add pointer cursor for better UX */
+}
+
+.button-start:hover {
+  background-color: black;
+  color: whitesmoke;
+}
+
+.button-start-div {
+  display: flex;
+  justify-content: center; /* Center content horizontally */
+  align-items: center; /* Center content vertically */
+  margin: 70px; /* Adjust margin as needed */
+}
+
+.image1 img{
+  position:absolute;
+  top: 70px;
+  right: 200px;
+  width: 300px;
+  z-index: -99;
+}
+.image2 img{
+  position:absolute;
+  top: 200px;
+  right: 200px;
+  width: 400px;
+  z-index: -99;
+}
+.background-containers div {
+  position:absolute;
+  z-index: -100;
+  width: 600px;
+  height: 600px;
+}
+.container1{
+  opacity: 0.6;
+  border-radius: 50px;
+  top: -270px;
+  right: -130px;
+  transform: rotate(49deg);
+  filter: blur(10px); /* Adjust the value for more or less blur */
+  background: linear-gradient(to right, #80b3ff, #1e0b4b); /* Adjust colors and direction as needed */
+}
+.container2{
+  opacity: 0.6;
+  border-radius: 50px;
+  top: 360px;
+  left: -130;
+  transform: rotate(49deg);
+  filter: blur(10px); /* Adjust the value for more or less blur */
+  background: linear-gradient(to right, #68a5ff, #77ff77); /* Adjust colors and direction as needed */
+}
+.container3{
+  opacity: 0.6;
+  border-radius: 50px;
+  top: 700px;
+  right:-233px;
+  transform: rotate(49deg);
+  filter: blur(10px); /* Adjust the value for more or less blur */
+  background: linear-gradient(to right, #ffffff, #2e3f6e); /* Adjust colors and direction as needed */
+}
