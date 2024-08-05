@@ -2,7 +2,10 @@
 .content-wrapper {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  margin-top: 50px;
+  position:sticky;
+  width: 100%;
+  overflow: hidden;
 }
 
 main {
@@ -10,22 +13,20 @@ main {
 }
 
 footer {
-  position: absolute;
-  bottom: 0;
-  background-color: black;
   color: aliceblue;
-  width: 100%;
   background: linear-gradient(to right, #000000, #3a3a3a);
-  height: 100px;
+  height: auto;
   display: flex;
   justify-content: space-between; /* Aligns content horizontally */
   align-items: center; /* Centers content vertically */
-  padding: 20px; /* Adds padding for spacing */
+  padding-top: 20px; /* Adds padding for spacing */
 }
 
 .postpilot-logo img {
   width: 80px;
   position: relative; 
-  bottom: 0;
-  right: 0;
+  bottom: 7px;
+  right: 10px;
+  overflow-y: hidden;
+
 }
