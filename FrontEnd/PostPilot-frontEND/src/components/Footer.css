@@ -1,0 +1,34 @@
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  z-index: 1;
+}
+.postpilot{
+  margin-left: 10px;
+  margin-bottom:  10px;;
+}
+main {
+  flex: 1; /* Allow main content to grow and take available space */
+}
+
+footer {
+  color: aliceblue;
+  background: linear-gradient(to right, #000000, #3a3a3a);
+  height: auto;
+  display: flex;
+  justify-content: space-between; /* Aligns content horizontally */
+  align-items: center; /* Centers content vertically */
+  padding-top: 20px; /* Adds padding for spacing */
+}
+
+.postpilot-logo img {
+  width: 80px;
+  position: relative; 
+  bottom: 7px;
+  right: 10px;
+  overflow-y: hidden;
+
+}
