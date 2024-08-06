@@ -4,17 +4,38 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: "Roboto", sans-serif;
-  max-width: 100%;
-  overflow-x: hidden;
-}
 
+}
+html{
+  background-attachment: fixed;
+}
 body {
   background-color: #2B4446;
+}
+html, body{
+  font-family: "Roboto", sans-serif;
+  min-height: 100vh;
 }
 
 a {
   text-decoration: none;
   color: inherit;
   line-height: 1;
+}
+.wrapper{
+  height: 100%;
+}
+
+
+/* --------custom scrollbar----------- */
+
+::-webkit-scrollbar{
+  width: 0px;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-track{
+  background: #9daacc;
+}
+::-webkit-scrollbar-thumb{
+  background: linear-gradient(rgb(255, 255, 255) rgb(184, 187, 209));
 }

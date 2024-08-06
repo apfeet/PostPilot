@@ -1,6 +1,7 @@
 .hero{
   width: 100%;
-  max-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .header {
@@ -31,8 +32,8 @@
   font-weight: 500;
 }
 
-.about-us :hover {
-  background-color: #6D6D6D;
+.about-us:hover {
+  background-color: #888888;
 }
 
 .heading-upper {
@@ -124,3 +125,6 @@
   filter: blur(10px); /* Adjust the value for more or less blur */
   background: linear-gradient(to right, #ffffff, #2e3f6e); /* Adjust colors and direction as needed */
 }
+
+
+

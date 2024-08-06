@@ -1,13 +1,15 @@
-/* Flexbox wrapper to allow the footer to be pushed to the bottom */
 .content-wrapper {
   display: flex;
   flex-direction: column;
-  margin-top: 50px;
-  position:sticky;
   width: 100%;
-  overflow: hidden;
+  position: absolute;
+  bottom: 0;
+  z-index: 1;
 }
-
+.postpilot{
+  margin-left: 10px;
+  margin-bottom:  10px;;
+}
 main {
   flex: 1; /* Allow main content to grow and take available space */
 }
