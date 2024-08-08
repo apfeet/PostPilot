@@ -9,6 +9,8 @@ export default {
      backgroundColor: {
       'costom-grey': '#2B4446',
       'costom-cyan': '#90F3FF',
+      'costom-lightgrey':'#56696b',
+      'costom-darkgrey':'#ECECEC'
      }
     },
   },
