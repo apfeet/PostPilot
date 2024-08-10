@@ -13,8 +13,8 @@ const LoginPage = () => {
   };
 
   return (
-    <div>
-      <div className="relative z-[0] flex h-screen items-center justify-center overflow-hidden bg-costom-grey">
+    <div className="bg-costom-grey">
+      <div className="background-login relative flex h-screen items-center justify-center overflow-hidden bg-cover bg-center">
         {/* Main container with full screen height and background color */}
 
         <div>
@@ -36,7 +36,7 @@ const LoginPage = () => {
           {/* Logo with fade effect based on hover state */}
         </div>
 
-        <div className="z-[100] flex w-[700px] flex-col items-center justify-center overflow-hidden rounded-3xl bg-costom-lightgrey pb-4 pt-8 shadow-[0_0_15px_5px_rgba(86,105,107,0.7)]">
+        <div className="z-[100] flex w-[700px] flex-col items-center justify-center overflow-hidden rounded-3xl bg-costom-lightgrey pb-4 pt-8 opacity-90 shadow-[0_0_15px_5px_rgba(86,105,107,0.7)] lg:opacity-100">
           {/* Form container with shadow and rounded corners */}
 
           <div>
