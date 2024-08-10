@@ -11,6 +11,9 @@ export default {
       'costom-cyan': '#90F3FF',
       'costom-lightgrey':'#56696b',
       'costom-darkgrey':'#ECECEC'
+     },
+     backgroundImage: {
+      'login-page':"url(''../assets/waves-background.png'')"
      }
     },
   },
