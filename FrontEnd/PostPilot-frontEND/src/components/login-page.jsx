@@ -1,26 +1,65 @@
-import React, { useState } from "react"; // Import React and useState hook
-import LOGO from "../assets/LOGO.webp"; // Import the logo image
-import googleIcon from "../assets/GoogleLogin.png"; // Import the Google icon image
-import YoungLady from "../assets/B8_1.png"; // Import the image of the young lady
+import React, { useState, useEffect } from "react";
+import LOGO from "../assets/LOGO.webp";
+import googleIcon from "../assets/GoogleLogin.png";
+import YoungLady from "../assets/B8_1.png";
 
 const LoginPage = () => {
-  // Define a functional component
-  const [isHovered, setIsHovered] = useState(false); // State to track hover effect on the button
-  const [isLogin, setIsLogin] = useState(true); // State to track login/register mode
+  const [isHovered, setIsHovered] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
+  const [waveHeight, setWaveHeight] = useState(200);
 
   const handleClick = () => {
-    setIsLogin(!isLogin); // Toggle between login and register
+    setIsLogin(!isLogin);
   };
 
+  useEffect(() => {
+    const animateWave = () => {
+      setWaveHeight((prevHeight) => {
+        if (isHovered) {
+          return Math.max(prevHeight - 10, 0);
+        } else {
+          return Math.min(prevHeight + 10, 200);
+        }
+      });
+    };
+  
+    const animationFrame = requestAnimationFrame(function animate() {
+      animateWave();
+      if ((isHovered && waveHeight > 0) || (!isHovered && waveHeight < 200)) {
+        requestAnimationFrame(animate);
+      }
+    });
+  
+    return () => cancelAnimationFrame(animationFrame);
+  }, [isHovered, waveHeight]);
+
   return (
-    <div className="bg-costom-grey">
-      <div className="background-login relative flex h-screen items-center justify-center overflow-hidden bg-cover bg-center">
-        {/* Main container with full screen height and background color */}
+    <div className="bg-slate-950">
+      <div className="relative flex h-screen items-center justify-center overflow-hidden">
+        {/* First Background */}
+        <div className="absolute top-0 left-0 h-1/2 w-full bg-slate-800"></div>
+
+        {/* Wave Effect */}
+        <div className="absolute top-[50%] left-0 w-full h-[150px] overflow-hidden">
+          <div className="relative w-full h-full">
+            <div 
+              className="absolute top-0 left-1/2 w-full bg-slate-950 rounded-[50%] transform -translate-x-1/2 -translate-y-[75%] transition-all duration-300 ease-in-out"
+              style={{ height: `${waveHeight}px` }}
+            ></div>
+            <div 
+              className="absolute top-0 left-1/2 w-full bg-slate-800 rounded-[50%] transform -translate-x-1/2 -translate-y-[65%] transition-all duration-300 ease-in-out"
+              style={{ height: `${waveHeight}px` }}
+            ></div>
+          </div>
+        </div>
+
+        {/* Second Background */}
+        <div className="absolute top-[calc(50%+50px)] left-0 h-[calc(50%-50px)] w-full bg-slate-950"></div>
 
         <div>
           <img
             src={YoungLady}
-            alt="Study women"
+            alt="Study woman"
             className={`absolute bottom-[-10px] left-[0px] z-[100] w-[400px] transition-all duration-300 ease-in-out ${
               isHovered ? "translate-x-[-450px]" : "translate-x-[0px]"
             }`}
@@ -33,17 +72,11 @@ const LoginPage = () => {
           }`}
         >
           <img src={LOGO} alt="PostPilot" className="w-16 rounded" />
-          {/* Logo with fade effect based on hover state */}
         </div>
 
         <div className="z-[100] flex w-[700px] flex-col items-center justify-center overflow-hidden rounded-3xl bg-costom-lightgrey pb-4 pt-8 opacity-90 shadow-[0_0_15px_5px_rgba(86,105,107,0.7)] lg:opacity-100">
-          {/* Form container with shadow and rounded corners */}
-
-          <div>
-            <div className="text-5xl font-bold text-white">
-              {isLogin ? "First Time Here ?" : "Login"}
-              {/* Conditional text for login/register */}
-            </div>
+          <div className="text-5xl font-bold text-white">
+            {isLogin ? "First Time Here ?" : "Login"}
           </div>
 
           <div className="mb-3 mt-7 flex w-4/5 items-center justify-center">
@@ -54,7 +87,6 @@ const LoginPage = () => {
               className="w-6/12 rounded-2xl border bg-costom-cyan p-3 text-gray-600 opacity-90"
               placeholder="Email"
             />
-            {/* Username input field */}
           </div>
 
           <div className="mb-6 flex w-4/5 items-center justify-center">
@@ -65,7 +97,6 @@ const LoginPage = () => {
               className="w-6/12 rounded-2xl border border-gray-300 bg-costom-cyan p-3 text-gray-700"
               placeholder="Password"
             />
-            {/* Password input field */}
           </div>
 
           <div className="mt-8 flex w-[90%] justify-between">
@@ -75,7 +106,6 @@ const LoginPage = () => {
                 className="relative bottom-0 flex h-12 w-24 items-center justify-center rounded-2xl bg-white font-semibold text-black transition duration-300 hover:bg-black hover:text-white"
               >
                 <span>Send</span>
-                {/* Button to send the login/register form */}
               </a>
 
               <div className="relative ml-3 h-12 rounded-2xl bg-stone-500">
@@ -86,13 +116,11 @@ const LoginPage = () => {
                       alt="GoogleIcon"
                       className="mr-0 w-11 rounded-full border-none p-1"
                     />
-                    {/* Google icon inside the button */}
                   </div>
                   <div className="overflow-hidden">
                     <div className="flex w-0 items-center justify-center opacity-0 transition-all duration-300 ease-in-out group-hover:w-24 group-hover:opacity-100">
                       <span className="text-white">Google </span>&nbsp;
                       <span className="mr-1 text-white">Auth</span>
-                      {/* Text that appears on hover */}
                     </div>
                   </div>
                 </a>
@@ -105,10 +133,9 @@ const LoginPage = () => {
                 className="mt-3 flex w-24 items-center justify-center rounded-2xl bg-white px-4 pb-1 pt-2 font-semibold text-black transition duration-300 hover:bg-black hover:text-white"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
-                onClick={handleClick} // Toggle between login and register
+                onClick={handleClick}
               >
                 <span>{isLogin ? "Log-in" : "Register"}</span>
-                {/* Conditional text for the button */}
               </a>
             </div>
           </div>

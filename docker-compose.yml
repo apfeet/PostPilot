@@ -13,6 +13,8 @@ services:
       - "5173:5173"
     environment:
       - CHOKIDAR_USEPOLLING=true
+    networks:
+      - postpilot_network
 
   backend:
     build:
@@ -28,6 +30,9 @@ services:
     environment:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
+      - MONGODB_HOST=${MONGODB_HOST}
+    networks:
+      - postpilot_network
 
   mongodb:
     image: mongo:latest
@@ -39,3 +44,9 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${DB_USER}
       - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
+    networks:
+      - postpilot_network
+
+networks:
+  postpilot_network:
+    driver: bridge
