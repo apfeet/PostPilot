@@ -20,18 +20,15 @@ class User:
         self.db = self.client['PostPilot']
         self.users_collection = self.db['users']
 
-    def create_user(self, username, email, password, check_password, plan="default"):
+    def create_user(self, username, email, hashed_password, plan="default"):
         if self._user_exists(username, email):
             return "User already exists."
 
-        password_check = self._check_password_integrity(password, check_password)
-        if password_check is not True:
-            return password_check
-
+        
         user_data = {
             "username": username,
             "email": email,
-            "password": password,
+            "password": hashed_password,
             "plan": plan
         }
         self.users_collection.insert_one(user_data)
