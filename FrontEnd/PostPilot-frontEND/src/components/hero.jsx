@@ -2,8 +2,8 @@ import React from "react";
 import bgimage1 from "../assets/bg-image1.png";
 import bgimage2 from "../assets/bg-image2.png";
 import logo from "../assets/LOGO.webp";
-import Typewriter from "../logcomponents/typewriter.jsx";
-import Calendar from "../logcomponents/calendar.jsx";
+import Typewriter from "./logcomponents/typewriter.jsx";
+import Calendar from "./logcomponents/calendar.jsx";
 
 const Hero = () => {
   const words = ["Instagram.", "Facebook.", "TikTok.", "Twitter."];
