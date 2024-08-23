@@ -4,7 +4,7 @@ import bgimage2 from "../assets/bg-image2.png";
 import logo from "../assets/LOGO.webp";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Typewriter from "../logcomponents/typewriter";
+import Typewriter from "./logcomponents/typewriter";
 
 // Custom hooks
 const useIsMobile = () => {
