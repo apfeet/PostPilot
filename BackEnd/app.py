@@ -1,9 +1,13 @@
 from flask import Flask
 from flask_session import Session
+from flask_cors import CORS
 from module.routes.registerLogin import auth_bp
 import os
 
 app = Flask(__name__)
+
+# CORS configuration
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173", "supports_credentials": True}})
 
 # Session configuration
 app.config['SECRET_KEY'] = os.urandom(24)

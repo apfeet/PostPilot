@@ -73,7 +73,7 @@ const HeroSection = () => {
         <span className="ml-2 text-white opacity-40">your</span>
         <br className="md:hidden" />
         <span className="font-semibold text-teal-400">POST</span>
-        <span className="ml-2 text-white opacity-40">on</span>
+        <span className="ml-2 text-white opacity-40">on </span>
         <br className="md:hidden" />
         <span className="font-semibold text-white opacity-40">
           <Typewriter
