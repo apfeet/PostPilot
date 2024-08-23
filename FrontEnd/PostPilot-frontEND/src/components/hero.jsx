@@ -1,162 +1,213 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import bgimage1 from "../assets/bg-image1.png";
 import bgimage2 from "../assets/bg-image2.png";
 import logo from "../assets/LOGO.webp";
-import Typewriter from "./logcomponents/typewriter.jsx";
-import Calendar from "./logcomponents/calendar.jsx";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Typewriter from "../logcomponents/typewriter";
 
-const Hero = () => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const words = ["Instagram.", "Facebook.", "TikTok.", "Twitter."];
+// Custom hooks
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
-    setIsLoaded(true);
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  return isMobile;
+};
+
+const useAnimations = () => {
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: ".event-cards",
+        start: "top 80%",
+        end: "bottom 20%",
+        scrub: 1,
+      },
+    });
+
+    tl.fromTo(".event-card", 
+      { y: 100, opacity: 0 },
+      { y: 0, opacity: 1, stagger: 0.2, duration: 1 }
+    );
+
+    gsap.fromTo(".info-box",
+      { y: 50, opacity: 0 },
+      { 
+        y: 0, 
+        opacity: 1, 
+        duration: 1,
+        scrollTrigger: {
+          trigger: ".info-box",
+          start: "top 80%",
+          end: "bottom 20%",
+        }
+      }
+    );
+  }, []);
+};
+
+// Sub-components
+const Header = () => (
+  <header className="z-10 flex items-center justify-between p-4 md:p-8">
+    <img src={logo} alt="PostPilot" className="w-16 h-14 md:w-18 md:h-16 rounded-md" />
+    <button className="rounded-full bg-transparent bg-white px-4 py-1 md:px-6 md:py-2 text-sm md:text-lg font-semibold shadow-md transition duration-300 hover:bg-gray-400">
+      About Us
+    </button>
+  </header>
+);
+
+const HeroSection = () => {
+  const words = ["Instagram.", "Facebook.", "TikTok.", "Twitter."];
+
   return (
-    <div className="no-scrollbar relative min-h-screen overflow-hidden bg-costom-grey">
-      {/* Background Blocks */}
-      <div className="absolute inset-0 z-10 overflow-hidden">
-        <div
-          className={`absolute -right-[130px] -top-[270px] h-[600px] w-[600px] rotate-[49deg] rounded-[50px] bg-gradient-to-r from-[#80b3ff] to-[#1e0b4b] opacity-60 blur-[10px] transition-all duration-1000 ease-out ${isLoaded ? "translate-x-0" : "translate-x-full"}`}
-        ></div>
-        <div
-          className={`absolute -left-[130px] top-[360px] h-[600px] w-[600px] rotate-[49deg] rounded-[50px] bg-gradient-to-r from-[#68a5ff] to-[#77ff77] opacity-60 blur-[10px] transition-all duration-1000 ease-out ${isLoaded ? "translate-x-0" : "-translate-x-full"}`}
-        ></div>
-        <div
-          className={`absolute -right-[233px] bottom-[100px] h-[600px] w-[600px] rotate-[49deg] rounded-[50px] bg-gradient-to-r from-[#ffffff] to-[#2e3f6e] opacity-60 blur-[10px] transition-all duration-1000 ease-out ${isLoaded ? "translate-x-0" : "translate-x-full"}`}
-        ></div>
+    <section className="mt-16 md:mt-28 text-center md:text-left">
+      <h1 className="text-3xl md:text-5xl">
+        <span className="font-semibold text-white">Schedule</span>
+        <span className="ml-2 text-white opacity-40">your</span>
+        <br className="md:hidden" />
+        <span className="font-semibold text-teal-400">POST</span>
+        <span className="ml-2 text-white opacity-40">on</span>
+        <br className="md:hidden" />
+        <span className="font-semibold text-white opacity-40">
+          <Typewriter
+            words={words}
+            typeSpeed={200}
+            deleteSpeed={150}
+            pause={1500}
+          />
+        </span>
+      </h1>
+    </section>
+  );
+};
+
+const FeatureSection = () => (
+  <>
+    <section className="mt-8 md:mt-10 text-center md:text-left">
+      <h2 className="text-3xl md:text-4xl">
+        <span className="font-semibold text-white">Easy</span>
+        <span className="ml-2 text-white opacity-25">and</span>
+        <br className="md:hidden" />
+        <span className="font-semibold text-white">Practical</span>
+        <br className="md:hidden" />
+        <span className="ml-2 text-white opacity-25">to use</span>
+      </h2>
+    </section>
+    <section className="mt-10 flex justify-center">
+      <button className="rounded-lg bg-white px-6 py-2 md:px-8 md:py-3 text-lg font-medium text-black shadow-lg transition duration-300 hover:bg-black hover:text-white">
+        Start
+      </button>
+    </section>
+  </>
+);
+
+const EventCard = ({ title, time, bgClass }) => (
+  <div className={`event-card w-full p-4 bg-gradient-to-r ${bgClass} rounded-lg shadow-lg`}>
+    <h3 className="text-xl md:text-2xl font-bold text-white">{title}</h3>
+    <p className="text-white mt-2">{time}</p>
+  </div>
+);
+
+const EventCards = () => (
+  <div className="event-cards space-y-4 md:space-y-6 w-full md:w-1/2">
+    <EventCard
+      title="Event 1: TikTok video"
+      time="8:00 AM"
+      bgClass="from-blue-500 to-purple-500"
+    />
+    <EventCard
+      title="Event 2: Instagram Post"
+      time="10:00 AM"
+      bgClass="from-green-400 to-blue-400"
+    />
+    <EventCard
+      title="Event 3: Twitter Post"
+      time="12:00 PM"
+      bgClass="from-red-400 to-yellow-400"
+    />
+  </div>
+);
+
+const InfoBox = () => (
+  <section className="mt-16 md:mt-24">
+    <div className="info-box p-6 bg-white bg-opacity-90 rounded-lg shadow-lg">
+      <h2 className="text-2xl md:text-3xl font-bold text-black mb-4">
+        More About the Project
+      </h2>
+      <p className="text-lg text-gray-700">
+        This project aims to streamline your social media management.
+      </p>
+      <p className="text-lg text-gray-700 mt-2">
+        Create, schedule, and enjoy seamless content posting across platforms.
+      </p>
+      <p className="text-lg text-gray-700 mt-2">
+        The main goal is to serve this in a super easy way.
+      </p>
+    </div>
+  </section>
+);
+
+const BackgroundImages = () => (
+  <div className="hidden md:block">
+    <img
+      src={bgimage1}
+      alt="image 1"
+      className="absolute right-40 top-10 z-[-10] w-72"
+    />
+    <img
+      src={bgimage2}
+      alt="image 2"
+      className="absolute right-40 top-[16rem] z-[-10] w-96"
+    />
+  </div>
+);
+
+const Footer = () => (
+  <footer className="bg-gray-900 text-white p-4 md:p-6 mt-16">
+    <div className="flex flex-col md:flex-row justify-between items-center">
+      <p className="text-sm mb-4 md:mb-0">&copy; 2024 PostPilot. All rights reserved.</p>
+      <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4">
+        <a href="#" className="hover:underline">Privacy Policy</a>
+        <a href="#" className="hover:underline">Terms of Service</a>
+        <a href="#" className="hover:underline">Contact Us</a>
       </div>
+    </div>
+  </footer>
+);
 
-      {/* Main content */}
-      <div className="relative z-20 flex min-h-screen flex-col">
-        {/* Header Section */}
-        <div className="flex items-center justify-between p-8">
-          <img
-            src={logo}
-            alt="PostPilot"
-            className={`w-18 h-16 rounded-md transition-all duration-1000 ease-out ${isLoaded ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"}`}
-          />
-          <button
-            className={`rounded-full bg-transparent bg-white px-6 py-2 text-lg font-semibold shadow-md transition-all duration-1000 ease-out hover:bg-gray-400 sm:mr-4 lg:mr-8 ${isLoaded ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"}`}
-          >
-            about us
-          </button>
-        </div>
+// Main component
+const Hero = () => {
+  const isMobile = useIsMobile();
+  useAnimations();
 
-        {/* Typewriter Text Section */}
-        <p
-          className={`mt-28 text-center text-5xl transition-all duration-1000 ease-out sm:ml-16 sm:mt-20 sm:text-left ${isLoaded ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"}`}
-        >
-          <span>
-            <span className="font-semibold text-white">Schedule</span>
-            <span className="ml-3 text-white opacity-40">your</span>
-          </span>
-          <br className="block sm:hidden" />
-          <span className="pt-5">
-            <span className="ml-3 font-semibold text-teal-400">POST</span>
-            <span className="ml-3 text-white opacity-40">on</span>
-          </span>
-          <br className="block sm:hidden" />
-          <span className="ml-3 font-semibold text-white opacity-40">
-            <Typewriter
-              words={words}
-              typeSpeed={200}
-              deleteSpeed={150}
-              pause={1500}
-            />
-          </span>
-        </p>
-
-        {/* Easy Practical Text Section */}
-        <div
-          className={`text-center transition-all duration-1000 ease-out sm:text-left ${isLoaded ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"}`}
-        >
-          <h1 className="mt-10 text-5xl sm:ml-16">
-            <span className="font-semibold text-white">Easy</span>
-            <span className="ml-3 text-white opacity-25">and</span>
-            <br className="block sm:hidden" />
-            <span className="ml-3 font-semibold text-white">Practical</span>
-            <br className="block sm:hidden" />
-            <span className="ml-3 text-white opacity-25">to use</span>
-          </h1>
-        </div>
-
-        {/* Start Button Section */}
-        <div
-          className={`mt-14 flex items-center justify-center transition-all duration-1000 ease-out ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"}`}
-        >
-          <button className="mt-16 rounded-lg bg-white px-8 py-3 text-lg font-medium text-black shadow-lg transition duration-300 hover:bg-black hover:text-white">
-            Start
-          </button>
-        </div>
-
-        {/* Create Schedule and Calendar Section */}
-        <div className="mb-20 mt-20 flex flex-col items-center justify-between space-y-8 px-4 sm:flex-row sm:space-x-8 sm:space-y-0 sm:px-8 lg:px-16">
-          <div
-            className={`flex w-full flex-col items-center justify-between text-left transition-all duration-1000 ease-out sm:w-1/2 lg:w-1/3 ${isLoaded ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"}`}
-          >
-            <p className="mb-2 text-3xl font-semibold text-white sm:text-4xl lg:text-5xl">
-              Create Schedule
-            </p>
-            <p className="text-4xl font-bold text-[#68EDC6] opacity-75 sm:text-5xl sm:font-extrabold">
-              Enjoy !
-            </p>
-            <p className="mt-9 flex text-5xl text-white">
-              <span className="hidden lg:inline">is that </span>
-              <span className="ml-0 block text-5xl font-bold lg:ml-2">
-                simple
-              </span>
+  return (
+    <div className="relative z-0 min-h-screen bg-gradient-to-br from-gray-800 to-blue-900">
+      <Header />
+      <main className="px-4 md:px-8">
+        <HeroSection />
+        <FeatureSection />
+        <section className="mt-16 md:mt-24 flex flex-col md:flex-row items-center justify-between relative">
+          <div className="text-center md:text-left mb-10 md:mb-0">
+            <p className="text-3xl md:text-4xl font-bold text-white">Create</p>
+            <p className="text-3xl md:text-4xl font-bold text-white">Schedule</p>
+            <p className="text-2xl md:text-3xl text-white mt-2">Enjoy!</p>
+            <p className="text-2xl md:text-3xl text-white mt-4">
+              Is that <span className="font-bold">Simple</span>
             </p>
           </div>
-          {/* Calendar Component */}
-          <div
-            className={`w-full max-w-md transition-all duration-1000 ease-out sm:w-1/2 lg:w-2/3 ${isLoaded ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"}`}
-          >
-            <Calendar />
-          </div>
-        </div>
-
-        {/* Background Images */}
-        <div className="pointer-events-none absolute inset-0 z-10">
-          <img
-            src={bgimage1}
-            alt="image 1"
-            className={`absolute right-40 top-10 hidden w-72 transition-all duration-1000 ease-out lg:block ${isLoaded ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"}`}
-          />
-          <img
-            src={bgimage2}
-            alt="image 2"
-            className={`absolute right-40 top-[16rem] hidden w-96 transition-all duration-1000 ease-out lg:block ${isLoaded ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"}`}
-          />
-        </div>
-
-        {/* Footer Section */}
-        <footer
-          className={`mt-auto w-full items-center bg-gradient-to-r from-black to-slate-900 text-white transition-all duration-1000 ease-out ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"}`}
-        >
-          <div className="flex min-h-20 items-center justify-between p-2">
-            <ul>
-              <li className="hidden lg:block">PostPilot </li>
-              <li className="block lg:hidden">
-                <img src={logo} className="mr-2 w-16 rounded" />
-              </li>
-            </ul>
-            <ul>
-              <li>
-                <a href="#" className="size-4">
-                  <i className="ri-instagram-line"></i>&nbsp;PostPilot
-                </a>
-              </li>
-            </ul>
-            <img
-              src={logo}
-              alt="PostPilot-img"
-              className="mr-2 hidden w-16 rounded sm:block"
-            />
-          </div>
-        </footer>
-      </div>
+          <EventCards />
+        </section>
+        <InfoBox />
+      </main>
+      {!isMobile && <BackgroundImages />}
+      <Footer />
     </div>
   );
 };

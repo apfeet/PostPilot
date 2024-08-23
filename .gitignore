@@ -2,3 +2,5 @@
 DataBase/
 
 .env
+
+BackEnd/flask_session
