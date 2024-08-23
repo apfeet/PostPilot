@@ -64,7 +64,7 @@ const Header = () => (
 );
 
 const HeroSection = () => {
-  const words = ["Instagram.", "Facebook.", "TikTok.", "Twitter."];
+  const words = ["Instagram", "Facebook", "TikTok", "Twitter"];
 
   return (
     <section className="mt-16 md:mt-28 text-center md:text-left">
