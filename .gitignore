@@ -4,3 +4,6 @@ DataBase/
 .env
 
 BackEnd/flask_session
+
+
+**/__pycache__/
