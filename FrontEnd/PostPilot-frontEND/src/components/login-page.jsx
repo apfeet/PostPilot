@@ -35,7 +35,7 @@ const LoginPage = () => {
 
   return (
     <div className="bg-slate-950">
-      <div className="relative flex h-screen items-center justify-center overflow-hidden">
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden">
         {/* First Background */}
         <div className="absolute top-0 left-0 h-1/2 w-full bg-slate-800"></div>
 
@@ -60,7 +60,7 @@ const LoginPage = () => {
           <img
             src={YoungLady}
             alt="Study woman"
-            className={`absolute bottom-[-10px] left-[0px] z-[100] w-[400px] transition-all duration-300 ease-in-out ${
+            className={`absolute bottom-[-10px] left-[0px] z-[100] w-[200px] sm:w-[300px] md:w-[400px] transition-all duration-300 ease-in-out ${
               isHovered ? "translate-x-[-450px]" : "translate-x-[0px]"
             }`}
           />
@@ -71,36 +71,36 @@ const LoginPage = () => {
             isHovered ? "opacity-0" : "opacity-100"
           }`}
         >
-          <img src={LOGO} alt="PostPilot" className="w-16 rounded" />
+          <img src={LOGO} alt="PostPilot" className="w-12 sm:w-16 rounded" />
         </div>
 
-        <div className="z-[100] flex w-[700px] flex-col items-center justify-center overflow-hidden rounded-3xl bg-costom-lightgrey pb-4 pt-8 opacity-90 shadow-[0_0_15px_5px_rgba(86,105,107,0.7)] lg:opacity-100">
-          <div className="text-5xl font-bold text-white">
+        <div className="z-[100] flex w-full max-w-[90%] sm:max-w-[500px] md:max-w-[700px] flex-col items-center justify-center overflow-hidden rounded-3xl bg-costom-lightgrey p-4 sm:p-8 opacity-90 shadow-[0_0_15px_5px_rgba(86,105,107,0.7)] lg:opacity-100">
+          <div className="text-2xl sm:text-3xl md:text-5xl font-bold text-white">
             {isLogin ? "First Time Here ?" : "Login"}
           </div>
 
-          <div className="mb-3 mt-7 flex w-4/5 items-center justify-center">
+          <div className="mb-3 mt-7 flex w-full max-w-[80%] items-center justify-center">
             <label htmlFor="username" className="block text-gray-500"></label>
             <input
               id="username"
               type="text"
-              className="w-6/12 rounded-2xl border bg-costom-cyan p-3 text-gray-600 opacity-90"
+              className="w-full sm:w-6/12 rounded-2xl border bg-costom-cyan p-3 text-gray-600 opacity-90"
               placeholder="Email"
             />
           </div>
 
-          <div className="mb-6 flex w-4/5 items-center justify-center">
+          <div className="mb-6 flex w-full max-w-[80%] items-center justify-center">
             <label htmlFor="password" className="block"></label>
             <input
               id="password"
               type="password"
-              className="w-6/12 rounded-2xl border border-gray-300 bg-costom-cyan p-3 text-gray-700"
+              className="w-full sm:w-6/12 rounded-2xl border border-gray-300 bg-costom-cyan p-3 text-gray-700"
               placeholder="Password"
             />
           </div>
 
-          <div className="mt-8 flex w-[90%] justify-between">
-            <div className="flex">
+          <div className="mt-8 flex w-full max-w-[90%] justify-between flex-col sm:flex-row items-center">
+            <div className="flex mb-4 sm:mb-0">
               <a
                 href="#"
                 className="relative bottom-0 flex h-12 w-24 items-center justify-center rounded-2xl bg-white font-semibold text-black transition duration-300 hover:bg-black hover:text-white"

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import bgimage1 from "../assets/bg-image1.png";
 import bgimage2 from "../assets/bg-image2.png";
 import logo from "../assets/LOGO.webp";
@@ -88,7 +89,7 @@ const HeroSection = () => {
   );
 };
 
-const FeatureSection = () => (
+const FeatureSection = ({ onStartClick }) => (
   <>
     <section className="mt-8 md:mt-10 text-center md:text-left">
       <h2 className="text-3xl md:text-4xl">
@@ -101,7 +102,10 @@ const FeatureSection = () => (
       </h2>
     </section>
     <section className="mt-10 flex justify-center">
-      <button className="rounded-lg bg-white px-6 py-2 md:px-8 md:py-3 text-lg font-medium text-black shadow-lg transition duration-300 hover:bg-black hover:text-white">
+      <button 
+        className="rounded-lg bg-white px-6 py-2 md:px-8 md:py-3 text-lg font-medium text-black shadow-lg transition duration-300 hover:bg-black hover:text-white"
+        onClick={onStartClick}
+      >
         Start
       </button>
     </section>
@@ -185,14 +189,19 @@ const Footer = () => (
 // Main component
 const Hero = () => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   useAnimations();
+
+  const handleStartClick = () => {
+    navigate('/login-register');
+  };
 
   return (
     <div className="relative z-0 min-h-screen bg-gradient-to-br from-gray-800 to-blue-900">
       <Header />
       <main className="px-4 md:px-8">
         <HeroSection />
-        <FeatureSection />
+        <FeatureSection onStartClick={handleStartClick} />
         <section className="mt-16 md:mt-24 flex flex-col md:flex-row items-center justify-between relative">
           <div className="text-center md:text-left mb-10 md:mb-0">
             <p className="text-3xl md:text-4xl font-bold text-white">Create</p>
