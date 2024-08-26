@@ -1,31 +1,36 @@
 version: '3.9'
-
 services:
   frontend:
+    env_file:
+      - .env
     build:
       context: ./FrontEnd
-      dockerfile: Dockerfile
+      dockerfile: ${MODALITY}_Dockerfile
     volumes:
-      - ./FrontEnd/PostPilot-frontEND:/app
+      - ${MODALITY}_frontend_volume:/app
       - /app/node_modules
-      - ./FrontEnd/PostPilot-frontEND/dist:/app/dist  
     ports:
-      - "5173:5173"
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    expose:
+      - "${FRONTEND_PORT}"
     environment:
       - CHOKIDAR_USEPOLLING=true
     networks:
       - postpilot_network
 
   backend:
+    env_file:
+      - .env
     build:
       context: ./BackEnd
-      dockerfile: Dockerfile
+      dockerfile: ${MODALITY}_Dockerfile
     volumes:
       - ./BackEnd:/app
     ports:
-      - "5000:5000"
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
+    expose:
+      - "${BACKEND_PORT}"
     depends_on:
-      - frontend
       - mongodb
     environment:
       - DB_USER=${DB_USER}
@@ -46,7 +51,54 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
     networks:
       - postpilot_network
+    command: ["mongod", "--quiet", "--logpath", "/dev/null"]
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "${NGINX_PORT}:${NGINX_PORT}"
+    volumes:
+      - ./nginx.conf.template:/etc/nginx/nginx.conf.template:ro
+      - ./entrypoint.sh:/entrypoint.sh:ro
+    env_file:
+      - .env
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - postpilot_network
+    entrypoint: /bin/sh -c "/entrypoint.sh"
+
+  reportlogsandstats:
+    build:
+      context: ./reportlogsandstats
+      dockerfile: Dockerfile
+    container_name: reportlogsandstats
+    volumes:
+      - ./reportlogsandstats:/app
+      - ./reportlogsandstats/logs:/app/logs
+    working_dir: /app
+    env_file:
+      - .env
+    networks:
+      - postpilot_network
+    depends_on:
+      - mongodb
 
 networks:
   postpilot_network:
     driver: bridge
+
+volumes:
+  env_frontend_volume:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./FrontEnd/PostPilot-frontEND
+      o: bind
+  prod_frontend_volume:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./FrontEnd/PostPilot-frontEND/dist
+      o: bind

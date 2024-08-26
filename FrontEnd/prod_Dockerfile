@@ -1,0 +1,20 @@
+# Usa l'immagine di base per il build di Node.js
+FROM node:16 AS build
+WORKDIR /app
+COPY ./PostPilot-frontEND/package.json ./
+COPY ./PostPilot-frontEND/package-lock.json ./
+RUN npm install
+COPY ./PostPilot-frontEND/ .
+RUN npm run build
+
+# Usa l'immagine ufficiale di Caddy
+FROM caddy:2.6.2
+
+# Copia i file di build nel container
+COPY --from=build /app/dist /usr/share/caddy
+
+# Copia il file di configurazione Caddyfile nel container
+COPY Caddyfile /etc/caddy/Caddyfile
+
+# Espone la porta 8080
+EXPOSE 8080
