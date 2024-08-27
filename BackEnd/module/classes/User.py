@@ -1,6 +1,7 @@
 import re
 from pymongo import MongoClient
 from dotenv import load_dotenv
+from MongoDB_pool import MongoDBPool
 import os
 
 class User:
@@ -15,9 +16,8 @@ class User:
         self.MONGODB_HOST = os.getenv('MONGODB_HOST')
 
     def _connect_to_database(self):
-        connection_string = f'mongodb://{self.db_user}:{self.db_password}@{self.MONGODB_HOST}:27017/'
-        self.client = MongoClient(connection_string)
-        self.db = self.client['PostPilot']
+        mongo_pool = MongoDBPool()
+        self.db = mongo_pool.get_database()
         self.users_collection = self.db['users']
 
     def create_user(self, username, email, hashed_password, plan="default"):

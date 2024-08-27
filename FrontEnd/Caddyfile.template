@@ -1,0 +1,7 @@
+:{{FRONTEND_PORT}} {
+    root * /usr/share/caddy
+    file_server
+
+    # Aggiunta della gestione del fallback per il routing di una SPA
+    try_files {path} /index.html
+}

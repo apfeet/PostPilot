@@ -1,1 +1,1 @@
-# .gitattributes*.sh text eol=lf
+.gitattributes*.sh text eol=lf
