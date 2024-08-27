@@ -26,7 +26,7 @@ else
     log "✅" "MODALITY is not 'env'. Proceeding with Nginx setup."
     
     log "🔧" "Substituting environment variables in nginx.conf..."
-    envsubst '\$HOST \$FRONTEND_PORT \$BACKEND_PORT \$NGINX_PORT' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
+    envsubst '\$HOST \$FRONTEND_PORT \$BACKEND_PORT \$NGINX_PORT' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf
     
     log "📄" "Displaying final nginx.conf:"
     cat /etc/nginx/nginx.conf

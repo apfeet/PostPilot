@@ -148,5 +148,5 @@ while true; do
     else
         generate_report
     fi
-    sleep 600 # Wait for 10 minutes
+    sleep 600
 done

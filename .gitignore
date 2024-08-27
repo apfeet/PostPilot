@@ -1,9 +1,14 @@
 # MongoDB data
 DataBase/
 
+#config_var
 .env
 
+#sessions
 BackEnd/flask_session
 
+#report_logs
+ReportLogsAndStats/logs
 
+#python_cache
 **/__pycache__/
