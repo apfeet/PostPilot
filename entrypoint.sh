@@ -35,4 +35,4 @@ else
     nginx -g 'daemon off;'
 fi
 
-log "🎉" "Script execution completed!"
+log "🎉" "Script execution completed!!"

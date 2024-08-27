@@ -28,7 +28,7 @@ print_dev_mode_message() {
 ${NC}"
 }
 
-# Set memory threshold to 5GB
+
 MEM_THRESHOLD=5000
 
 # Check if jq is installed
