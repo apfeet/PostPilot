@@ -7,7 +7,7 @@ services:
       context: ./FrontEnd
       dockerfile: ${MODALITY}_Dockerfile
     volumes:
-      - ${MODALITY}_frontend_volume:/app
+      - ./FrontEnd:/app
       - /app/node_modules
     ports:
       - "${FRONTEND_PORT}:${FRONTEND_PORT}"
@@ -54,36 +54,38 @@ services:
     command: [ "mongod", "--quiet", "--logpath", "/dev/null" ]
 
   nginx:
-    image: nginx:latest
+      image: nginx:latest
+      env_file:
+        - .env
+      ports:
+        - "${NGINX_PORT}:${NGINX_PORT}"
+        - "443:443"
+      volumes:
+        - ./nginx.conf.template:/etc/nginx/nginx.conf.template:ro
+        - ./entrypoint.sh:/entrypoint.sh:ro
+        - ./ssl:/etc/nginx/ssl
+      depends_on:
+        - frontend
+        - backend
+      networks:
+        - postpilot_network
+      entrypoint: /bin/sh -c "/entrypoint.sh"
+
+  reportlogsandstats:
+    build:
+      context: ./reportlogsandstats
+      dockerfile: Dockerfile
+    container_name: reportlogsandstats
+    volumes:
+      - ./reportlogsandstats:/app
+      - ./reportlogsandstats/logs:/app/logs
+    working_dir: /app
     env_file:
       - .env
-    ports:
-      - "${NGINX_PORT}:${NGINX_PORT}"
-    volumes:
-      - ./nginx.conf.template:/etc/nginx/nginx.conf.template:ro
-      - ./entrypoint.sh:/entrypoint.sh:ro
-    depends_on:
-      - frontend
-      - backend
     networks:
       - postpilot_network
-    entrypoint: /bin/sh -c "/entrypoint.sh"
-
-  # reportlogsandstats:
-  #   build:
-  #     context: ./reportlogsandstats
-  #     dockerfile: Dockerfile
-  #   container_name: reportlogsandstats
-  #   volumes:
-  #     - ./reportlogsandstats:/app
-  #     - ./reportlogsandstats/logs:/app/logs
-  #   working_dir: /app
-  #   env_file:
-  #     - .env
-  #   networks:
-  #     - postpilot_network
-  #   depends_on:
-  #     - mongodb
+    depends_on:
+      - mongodb
 
 networks:
   postpilot_network:

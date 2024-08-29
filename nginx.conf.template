@@ -24,7 +24,11 @@ http {
 
     server {
         listen ${NGINX_PORT};
+        listen 443 ssl;
         server_name ${HOST};
+
+        ssl_certificate /etc/nginx/ssl/nginx.crt;
+        ssl_certificate_key /etc/nginx/ssl/nginx.key;
 
         location / {
             proxy_pass http://frontend:${FRONTEND_PORT};
@@ -82,9 +86,10 @@ http {
                 return 204;
             }
         }
-          location /stub_status {
+
+        location /status {
             stub_status;
             allow all;
-          }
+        }
     }
 }
