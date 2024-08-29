@@ -69,21 +69,23 @@ const HeroSection = () => {
 
   return (
     <section className="mt-16 md:mt-28 text-center md:text-left">
-      <h1 className="text-3xl md:text-5xl">
+      <h1 className="text-3xl md:text-5xl md:flex">
         <span className="font-semibold text-white">Schedule</span>
         <span className="ml-2 text-white opacity-40">your</span>
         <br className="md:hidden" />
-        <span className="font-semibold text-teal-400">POST</span>
+        <span className="ml-2 font-semibold text-teal-400">POST</span>
         <span className="ml-2 text-white opacity-40">on </span>
         <br className="md:hidden" />
-        <span className="font-semibold text-white opacity-40">
-          <Typewriter
-            words={words}
-            typeSpeed={200}
-            deleteSpeed={150}
-            pause={1500}
-          />
-        </span>
+        <div style={{ height: '1.2em', overflow: 'hidden' ,marginLeft:"0.25em"}}> 
+          <span className="font-semibold text-white opacity-40 ">
+            <Typewriter
+              words={words}
+              typeSpeed={200}
+              deleteSpeed={150}
+              pause={1500}
+            />
+          </span>
+        </div>
       </h1>
     </section>
   );
@@ -96,7 +98,7 @@ const FeatureSection = ({ onStartClick }) => (
         <span className="font-semibold text-white">Easy</span>
         <span className="ml-2 text-white opacity-25">and</span>
         <br className="md:hidden" />
-        <span className="font-semibold text-white">Practical</span>
+        <span className="font-semibold text-white ml-2">Practical</span>
         <br className="md:hidden" />
         <span className="ml-2 text-white opacity-25">to use</span>
       </h2>
