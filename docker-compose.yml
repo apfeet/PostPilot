@@ -69,16 +69,6 @@ services:
       - postpilot_network
     entrypoint: /bin/sh -c "/entrypoint.sh"
 
-  nginx-prometheus-exporter:
-    image: nginx/nginx-prometheus-exporter:latest
-    depends_on:
-      - nginx
-    environment:
-      NGINX_STATUS_URL: "http://nginx:${NGINX_PORT}/stub_status"
-    ports:
-      - "9113:9113"
-    networks:
-      - postpilot_network
   # reportlogsandstats:
   #   build:
   #     context: ./reportlogsandstats
