@@ -2,11 +2,46 @@ import React, { useState, useEffect } from "react";
 import LOGO from "../assets/LOGO.webp";
 import googleIcon from "../assets/GoogleLogin.png";
 import YoungLady from "../assets/B8_1.png";
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 
 const LoginPage = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [waveHeight, setWaveHeight] = useState(200);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+        const response = await fetch('http://localhost:5000/api/register-login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert(data.message);  // Show success message
+            navigate('/dashboard');  // Redirect to the dashboard
+        } else {
+            alert(data.error);  // Show error message if login fails
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
+
+  
+
+
 
   const handleClick = () => {
     setIsLogin(!isLogin);
@@ -78,15 +113,18 @@ const LoginPage = () => {
           <div className="text-2xl sm:text-3xl md:text-5xl font-bold text-white">
             {isLogin ? "First Time Here ?" : "Login"}
           </div>
-
+          <form onSubmit={handleSubmit}>
           <div className="mb-3 mt-7 flex w-full max-w-[80%] items-center justify-center">
-            <label htmlFor="username" className="block text-gray-500"></label>
+            <label htmlFor="email" className="block text-gray-500"></label>
             <input
-              id="username"
-              type="text"
+              id="email"
+              type="email"
+              value={email}
               className="w-full sm:w-6/12 rounded-2xl border bg-costom-cyan p-3 text-gray-600 opacity-90"
               placeholder="Email"
-            />
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            /> 
           </div>
 
           <div className="mb-6 flex w-full max-w-[80%] items-center justify-center">
@@ -94,15 +132,22 @@ const LoginPage = () => {
             <input
               id="password"
               type="password"
+              value={password}
               className="w-full sm:w-6/12 rounded-2xl border border-gray-300 bg-costom-cyan p-3 text-gray-700"
               placeholder="Password"
+              onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
+            
+          </form>
 
           <div className="mt-8 flex w-full max-w-[90%] justify-between flex-col sm:flex-row items-center">
             <div className="flex mb-4 sm:mb-0">
-              <a
-                href="#"
+              <a 
+                type="submit"
+                
+                
                 className="relative bottom-0 flex h-12 w-24 items-center justify-center rounded-2xl bg-white font-semibold text-black transition duration-300 hover:bg-black hover:text-white"
               >
                 <span>Send</span>
