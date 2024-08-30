@@ -4,8 +4,7 @@ DataBase/
 #config_var
 .env
 
-ssl/nginx.crt
-ssl/nginx.key
+ssl/*
 
 #sessions
 BackEnd/flask_session

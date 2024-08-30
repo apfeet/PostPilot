@@ -2,6 +2,8 @@ from flask import Flask
 from flask_session import Session
 from flask_cors import CORS
 from module.routes.registerLogin import auth_bp
+#from module.routes.instagram_api import instagram_api
+
 import os
 
 app = Flask(__name__)
@@ -42,6 +44,8 @@ Session(app)
 
 # Register blueprints
 app.register_blueprint(auth_bp)
+# app.register_blueprint(instagram_api)
+
 
 if __name__ == '__main__':
     print(f"Frontend URL: {FRONTEND_URL}")

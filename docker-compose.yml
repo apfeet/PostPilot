@@ -7,7 +7,7 @@ services:
       context: ./FrontEnd
       dockerfile: ${MODALITY}_Dockerfile
     volumes:
-      - ./FrontEnd:/app
+      - ./FrontEnd/PostPilot-frontEND:/app
       - /app/node_modules
     ports:
       - "${FRONTEND_PORT}:${FRONTEND_PORT}"

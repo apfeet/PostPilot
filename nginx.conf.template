@@ -22,6 +22,18 @@ http {
 
     proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=my_cache:10m max_size=1g inactive=60m use_temp_path=off;
 
+    # Server for HTTP redirects and metrics
+    server {
+        listen 80;
+        server_name _;
+
+        location /status {
+            stub_status;
+            allow all;
+        }
+    }
+
+    # Main HTTPS server
     server {
         listen ${NGINX_PORT};
         listen 443 ssl;
@@ -29,6 +41,17 @@ http {
 
         ssl_certificate /etc/nginx/ssl/nginx.crt;
         ssl_certificate_key /etc/nginx/ssl/nginx.key;
+
+        # SSL settings
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers 'ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:!aNULL:!MD5:!3DES';
+        ssl_prefer_server_ciphers on;
+        ssl_session_cache shared:SSL:10m;
+        ssl_session_timeout 10m;
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains";
+        add_header X-Content-Type-Options nosniff;
+        add_header X-Frame-Options DENY;
+        add_header X-XSS-Protection "1; mode=block";
 
         location / {
             proxy_pass http://frontend:${FRONTEND_PORT};
@@ -49,7 +72,7 @@ http {
             proxy_cache_valid 404 1m;
             proxy_cache_bypass $http_upgrade;
 
-            # Fallback al frontend server per tutte le richieste
+            # Fallback to frontend server for all requests
             try_files $uri $uri/ @frontend;
         }
 
@@ -90,6 +113,36 @@ http {
         location /status {
             stub_status;
             allow all;
+        }
+    }
+
+    # Server for Grafana
+    server {
+        listen 443 ssl;
+        server_name ${GRAFANA_HOST};
+
+        ssl_certificate /etc/nginx/ssl/nginx.crt;
+        ssl_certificate_key /etc/nginx/ssl/nginx.key;
+
+        # SSL settings (same as main server)
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers 'ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:!aNULL:!MD5:!3DES';
+        ssl_prefer_server_ciphers on;
+        ssl_session_cache shared:SSL:10m;
+        ssl_session_timeout 10m;
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains";
+        add_header X-Content-Type-Options nosniff;
+        add_header X-Frame-Options DENY;
+        add_header X-XSS-Protection "1; mode=block";
+
+        location / {
+            proxy_pass http://192.168.1.149:3000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_buffering off;
+            client_max_body_size 10M;
         }
     }
 }

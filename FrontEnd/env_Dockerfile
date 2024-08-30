@@ -1,7 +1,7 @@
 FROM node:16
 WORKDIR /app
-COPY ./PostPilot-frontEND/package.json ./
-COPY ./PostPilot-frontEND/package-lock.json ./  
+COPY PostPilot-frontEND/package*.json ./
 RUN npm install
-COPY ./PostPilot-frontEND/ .
+COPY PostPilot-frontEND/ .
+RUN ls -la /app
 CMD ["sh", "-c", "env && npm run dev"]

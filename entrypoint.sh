@@ -14,6 +14,7 @@ echo "MODALITY: $MODALITY"
 echo "NGINX_PORT: $NGINX_PORT"
 echo "FRONTEND_PORT: $FRONTEND_PORT"
 echo "BACKEND_PORT: $BACKEND_PORT"
+echo "GRAFANA_HOST: $GRAFANA_HOST"
 echo "HOST: $HOST"
 
 # Check and create SSL certificate if needed

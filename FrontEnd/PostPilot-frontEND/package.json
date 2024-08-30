@@ -13,7 +13,6 @@
     "@devexpress/dx-react-core": "^4.0.8",
     "@devexpress/dx-react-scheduler": "^4.0.8",
     "@devexpress/dx-react-scheduler-material-ui": "^4.0.8",
-    "axios": "^1.7.5",
     "dotenv": "^16.4.5",
     "gsap": "^3.12.5",
     "react": "^18.3.1",

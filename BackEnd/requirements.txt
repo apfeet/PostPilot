@@ -3,3 +3,4 @@ flask-session
 flask-cors
 pymongo
 python-dotenv
+requests
