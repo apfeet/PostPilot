@@ -139,9 +139,7 @@ const LoginPage = () => {
               required
             />
           </div>
-            <div>
-              <button type="submit">submit</button>
-            </div>
+            
           </form>
 
           <div className="mt-8 flex w-full max-w-[90%] justify-between flex-col sm:flex-row items-center">
