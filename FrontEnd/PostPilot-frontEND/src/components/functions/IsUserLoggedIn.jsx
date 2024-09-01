@@ -5,11 +5,19 @@ export const checkUserStatus = async () => {
             credentials: "include",
         });
 
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
         const json = await response.json();
-        const loggedIn = json.logged_in;
-        return loggedIn;
+        if (typeof json.logged_in === 'boolean') {
+            return json.logged_in;
+        } else {
+            console.error("Unexpected response format:", json);
+            return false; // Assuming default false if the format is unexpected
+        }
     } catch (error) {
         console.error("Error checking user status:", error);
-        return false; 
+        return 'Error'; // Consider returning null or an empty object for consistency
     }
 };

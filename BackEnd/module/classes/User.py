@@ -20,13 +20,12 @@ class User:
         self.db = mongo_pool.get_database()
         self.users_collection = self.db['users']
 
-    def create_user(self, username, email, hashed_password, plan="default"):
-        if self._user_exists(username, email):
+    def create_user(self, user_id, email, hashed_password, plan="default"):
+        if self._user_exists(user_id, email):
             return "User already exists."
 
-        
         user_data = {
-            "username": username,
+            "username": user_id,
             "email": email,
             "password": hashed_password,
             "plan": plan
@@ -34,8 +33,8 @@ class User:
         self.users_collection.insert_one(user_data)
         return "User created successfully."
 
-    def _user_exists(self, username, email):
-        return self.users_collection.find_one({"$or": [{"username": username}, {"email": email}]}) is not None
+    def _user_exists(self, user_id, email):
+        return self.users_collection.find_one({"$or": [{"user_id": user_id}, {"email": email}]}) is not None
 
     def _check_password_integrity(self, password, check_password):
         if password != check_password:
@@ -52,25 +51,25 @@ class User:
             return "Password must contain at least one special character."
         return True
 
-    def delete_user(self, username):
-        result = self.users_collection.delete_one({"username": username})
+    def delete_user(self, user_id):
+        result = self.users_collection.delete_one({"user_id": user_id})
         if result.deleted_count > 0:
-            return f"User '{username}' deleted."
+            return f"User with ID '{user_id}' deleted."
         else:
-            return f"User '{username}' not found."
+            return f"User with ID '{user_id}' not found."
 
-    def get_user(self, username):
-        user = self.users_collection.find_one({"username": username})
+    def get_user(self, user_id):
+        user = self.users_collection.find_one({"user_id": user_id})
         if user:
             return user
         return None
 
-    def update_user(self, username, update_data):
-        if not self._user_exists(username, update_data.get('email', '')):
-            return f"User '{username}' not found."
+    def update_user(self, user_id, update_data):
+        if not self._user_exists(user_id, update_data.get('email', '')):
+            return f"User with ID '{user_id}' not found."
         
-        result = self.users_collection.update_one({"username": username}, {"$set": update_data})
+        result = self.users_collection.update_one({"user_id": user_id}, {"$set": update_data})
         if result.modified_count > 0:
-            return f"User '{username}' updated successfully."
+            return f"User with ID '{user_id}' updated successfully."
         else:
-            return f"No changes made to user '{username}'."
+            return f"No changes made to user with ID '{user_id}'."

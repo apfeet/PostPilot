@@ -1,18 +1,19 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import path from 'path';
 
-export default defineConfig(async () => {
-  const { config } = await import('dotenv');
-  config(); 
-
-  return {
-    plugins: [react()],
-    server: {
-      host: '0.0.0.0',
-      port: parseInt(process.env.FRONTEND_PORT) || 8080,  
-      hmr: {
-        overlay: false, 
-      },
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
     },
-  };
+  },
+  server: {
+    host: '0.0.0.0',
+    port: parseInt(process.env.FRONTEND_PORT) || 3000,
+    hmr: {
+      overlay: false,
+    },
+  },
 });
