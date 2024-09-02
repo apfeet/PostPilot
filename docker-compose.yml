@@ -54,22 +54,19 @@ services:
     command: [ "mongod", "--quiet", "--logpath", "/dev/null" ]
 
   nginx:
-      image: nginx:latest
-      env_file:
-        - .env
-      ports:
-        - "${NGINX_PORT}:${NGINX_PORT}"
-        - "443:443"
-      volumes:
-        - ./nginx.conf.template:/etc/nginx/nginx.conf.template:ro
-        - ./entrypoint.sh:/entrypoint.sh:ro
-        - ./ssl:/etc/nginx/ssl
-      depends_on:
-        - frontend
-        - backend
-      networks:
-        - postpilot_network
-      entrypoint: /bin/sh -c "/entrypoint.sh"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${NGINX_PORT}:${NGINX_PORT}"
+      - "443:443"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - postpilot_network
 
   reportlogsandstats:
     build:
