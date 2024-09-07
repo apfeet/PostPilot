@@ -15,6 +15,7 @@ services:
       - "${FRONTEND_PORT}"
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - COMPOSE_HTTP_TIMEOUT=120  # Increased timeout
     networks:
       - postpilot_network
 
@@ -71,7 +72,7 @@ services:
   reportlogsandstats:
     build:
       context: ./reportlogsandstats
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile  # Ensure this is the correct filename
     container_name: reportlogsandstats
     volumes:
       - ./reportlogsandstats:/app

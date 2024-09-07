@@ -1,0 +1,53 @@
+
+
+/* Styles for the modal button */
+.modal-button {
+    border-radius: 9999px; /* rounded-full */
+    background-color: white; /* bg-white */
+    padding: 0.25rem 1rem; /* px-4 py-1 */
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 600; /* font-semibold */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-md */
+    transition: background-color 0.3s ease, padding 0.3s ease; /* transition duration-300 */
+}
+
+.modal-button:hover {
+    background-color: #9ca3af; /* hover:bg-gray-400 */
+}
+
+@media (min-width: 768px) {
+  .modal-button {
+    padding: 0.5rem 1.5rem; /* Larger padding on medium screens */
+    font-size: 1.125rem; /* Larger font size on medium screens */
+  }
+}
+
+/* Styles for the modal overlay */
+.modal-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  z-index: 50;
+}
+
+/* Styles for the modal content */
+.modal-content {
+  background-color: #fff; /* White background for the modal */
+  padding: 2rem; /* Add padding inside the box */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow effect */
+  max-width: 600px; /* Max width of the modal */
+  width: 80%; /* 80% width on small screens */
+  position: relative;
+}
+
+/* Adjustments for small screens */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 80%; /* 80% width on small screens */
+    padding: 1rem; /* Reduced padding on small screens */
+  }
+}

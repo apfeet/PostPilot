@@ -6,6 +6,7 @@ import logo from "../assets/LOGO.webp";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Typewriter from "./logcomponents/typewriter";
+import AboutUsModal from "./logcomponents/about-us.jsx";
 
 // Custom hooks
 const useIsMobile = () => {
@@ -58,9 +59,11 @@ const useAnimations = () => {
 const Header = () => (
   <header className="z-10 flex items-center justify-between p-4 md:p-8">
     <img src={logo} alt="PostPilot" className="w-16 h-14 md:w-18 md:h-16 rounded-md" />
-    <button className="rounded-full bg-transparent bg-white px-4 py-1 md:px-6 md:py-2 text-sm md:text-lg font-semibold shadow-md transition duration-300 hover:bg-gray-400">
-      About Us
-    </button>
+    <AboutUsModal buttonText="About Us" title="About PostPilot">
+      <p>Welcome to PostPilot! We're a dynamic duo passionate about simplifying social media management. Our mission is to help you seamlessly schedule posts across Instagram, Facebook, Snapchat, and more.</p>
+      <p>At PostPilot, we understand the demands of managing multiple accounts. That's why we've built a platform to streamline your workflow, save you time, and boost your online presence.</p>
+      <p>Join us as we make social media scheduling easier and more efficient. Together, we'll take your online presence to new heights!</p>
+    </AboutUsModal>
   </header>
 );
 

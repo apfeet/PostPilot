@@ -1,12 +1,17 @@
-FROM nginx:latest
+FROM node:14
 
-# Copy the entrypoint script and set execute permissions
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Set the working directory
+WORKDIR /app
 
-# Copy other necessary files
-COPY nginx.conf.template /etc/nginx/nginx.conf.template
-COPY ssl /etc/nginx/ssl
+# Copy package.json and package-lock.json, then the rest of the application code
+COPY FrontEnd/PostPilot-frontEND/package*.json ./
+COPY FrontEnd/PostPilot-frontEND/ ./
 
-# Set the entrypoint
-ENTRYPOINT ["/entrypoint.sh"]
+# Install dependencies and change ownership of the app directory
+RUN npm install && chown -R node:node /app
+
+# Expose the port
+EXPOSE 3000
+
+# Start the application
+CMD ["npm", "start"]
