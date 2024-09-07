@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, Link } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { gsap } from 'gsap';
+import ReCAPTCHA from "react-google-recaptcha";
 import LOGO from "../assets/LOGO.webp";
 import googleIcon from "../assets/GoogleLogin.png";
 import YoungLady from "../assets/B8_1.png";
@@ -11,19 +13,46 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [captchaValue, setCaptchaValue] = useState(null);
   const navigate = useNavigate();
 
   const clientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID;
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+
+  const pageRef = useRef(null);
+  const formRef = useRef(null);
+  const youngLadyRef = useRef(null);
+  const logoRef = useRef(null);
+
+  useEffect(() => {
+    const tl = gsap.timeline({
+      onComplete: () => setIsLoaded(true)
+    });
+
+    if (pageRef.current && formRef.current && youngLadyRef.current && logoRef.current) {
+      tl.set([pageRef.current, formRef.current, youngLadyRef.current, logoRef.current], { autoAlpha: 0 });
+
+      tl.to(pageRef.current, { autoAlpha: 1, duration: 1 })
+        .to(formRef.current, { y: 0, autoAlpha: 1, duration: 1 }, "-=0.5")
+        .to(youngLadyRef.current, { x: 0, autoAlpha: 1, duration: 1 }, "-=0.5")
+        .to(logoRef.current, { scale: 1, autoAlpha: 1, duration: 1 }, "-=0.5");
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!captchaValue) {
+      setErrorMessage('Please complete the CAPTCHA');
+      return;
+    }
     try {
       const response = await fetch('http://localhost:5000/api/register-login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, captchaValue }),
         credentials: 'include',
       });
 
@@ -31,13 +60,26 @@ const LoginPage = () => {
 
       if (response.ok) {
         setErrorMessage('');
-        navigate('/dashboard');
+        if (formRef.current) {
+          gsap.to(formRef.current, { 
+            opacity: 0, 
+            y: -50, 
+            duration: 0.5, 
+            onComplete: () => navigate('/dashboard') 
+          });
+        }
       } else {
         setErrorMessage(data.error || 'An error occurred. Please try again.');
+        if (formRef.current) {
+          gsap.to(formRef.current, { x: [-10, 10, -10, 10, 0], duration: 0.5 });
+        }
       }
     } catch (error) {
       console.error('Error:', error);
       setErrorMessage('An error occurred. Please try again.');
+      if (formRef.current) {
+        gsap.to(formRef.current, { x: [-10, 10, -10, 10, 0], duration: 0.5 });
+      }
     }
   };
 
@@ -48,7 +90,7 @@ const LoginPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ token: response.credential }),
+        body: JSON.stringify({ token: response.credential, captchaValue }),
         credentials: 'include',
       });
 
@@ -56,19 +98,39 @@ const LoginPage = () => {
 
       if (res.ok) {
         setErrorMessage('');
-        navigate('/dashboard');
+        if (formRef.current) {
+          gsap.to(formRef.current, { 
+            opacity: 0, 
+            y: -50, 
+            duration: 0.5, 
+            onComplete: () => navigate('/dashboard') 
+          });
+        }
       } else {
         setErrorMessage(data.error || 'An error occurred. Please try again.');
+        if (formRef.current) {
+          gsap.to(formRef.current, { x: [-10, 10, -10, 10, 0], duration: 0.5 });
+        }
       }
     } catch (error) {
       console.error('Error:', error);
       setErrorMessage('An error occurred. Please try again.');
+      if (formRef.current) {
+        gsap.to(formRef.current, { x: [-10, 10, -10, 10, 0], duration: 0.5 });
+      }
     }
   };
 
   const handleGoogleFailure = (error) => {
     console.error('Google Sign-In failed:', error);
     setErrorMessage('Google Sign-In failed. Please try again.');
+    if (formRef.current) {
+      gsap.to(formRef.current, { x: [-10, 10, -10, 10, 0], duration: 0.5 });
+    }
+  };
+
+  const handleCaptchaChange = (value) => {
+    setCaptchaValue(value);
   };
 
   useEffect(() => {
@@ -80,9 +142,13 @@ const LoginPage = () => {
     return () => cancelAnimationFrame(animationFrameId);
   }, [isHovered, waveHeight]);
 
+  if (!isLoaded) {
+    return <div className="w-screen h-screen bg-slate-950"></div>;
+  }
+
   return (
     <GoogleOAuthProvider clientId={clientId}>
-      <div className="bg-slate-950">
+      <div ref={pageRef} className="bg-slate-950">
         <div className="relative flex min-h-screen items-center justify-center overflow-hidden">
           <div className="absolute top-0 left-0 h-1/2 w-full bg-slate-800"></div>
           <div className="absolute top-[50%] left-0 w-full h-[150px] overflow-hidden">
@@ -101,6 +167,7 @@ const LoginPage = () => {
 
           <div>
             <img
+              ref={youngLadyRef}
               src={YoungLady}
               alt="Study woman"
               className={`absolute bottom-[-10px] left-[0px] z-[100] w-[200px] sm:w-[300px] md:w-[400px] transition-all duration-300 ease-in-out ${
@@ -110,6 +177,7 @@ const LoginPage = () => {
           </div>
 
           <div
+            ref={logoRef}
             className={`absolute left-0 top-0 z-[100] transform p-5 transition-opacity duration-500 ${
               isHovered ? "opacity-0" : "opacity-100"
             }`}
@@ -118,6 +186,7 @@ const LoginPage = () => {
           </div>
 
           <div 
+            ref={formRef}
             className="z-[100] flex w-full max-w-[90%] sm:max-w-[500px] md:max-w-[700px] flex-col items-center justify-center overflow-hidden rounded-3xl bg-costom-lightgrey p-4 sm:p-8 opacity-90 shadow-[0_0_15px_5px_rgba(86,105,107,0.7)] lg:opacity-100"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
@@ -151,6 +220,12 @@ const LoginPage = () => {
                   required
                 />
               </div>
+              <div className="mb-6 flex w-full items-center justify-center">
+                <ReCAPTCHA
+                  sitekey={recaptchaSiteKey}
+                  onChange={handleCaptchaChange}
+                />
+              </div>
               <div className="flex w-full justify-center">
                 <button
                   type="submit"
@@ -181,6 +256,12 @@ const LoginPage = () => {
               />
             </div>
           </div>
+          <Link 
+            to="/" 
+            className="absolute top-4 right-4 z-[200] bg-white text-black px-3 py-1 rounded-full text-sm hover:bg-black hover:text-white transition-colors duration-300"
+          >
+            Home
+          </Link>
         </div>
       </div>
     </GoogleOAuthProvider>

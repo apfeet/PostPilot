@@ -14,10 +14,10 @@ export const checkUserStatus = async () => {
             return json.logged_in;
         } else {
             console.error("Unexpected response format:", json);
-            return false; // Assuming default false if the format is unexpected
+            return false; 
         }
     } catch (error) {
         console.error("Error checking user status:", error);
-        return 'Error'; // Consider returning null or an empty object for consistency
+        return 'Error';
     }
 };

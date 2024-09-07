@@ -1,3 +1,5 @@
+# File: app.py
+
 from flask import Flask, request
 from flask.sessions import SessionInterface, SessionMixin
 from flask_cors import CORS
@@ -97,9 +99,14 @@ app.session_interface = MongoDBSessionInterface(mongo_pool)
 # Register blueprints
 from module.routes.registerLogin import auth_bp
 from module.routes.instagram_api import instagram_bp
+from module.routes.misc import misc_blueprint
+from module.routes.task import task_bp  # Import the task blueprint
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(instagram_bp)
+app.register_blueprint(misc_blueprint)
+app.register_blueprint(task_bp)  # Register the task blueprint
+
 
 if __name__ == '__main__':
     print(f"Frontend URL: {FRONTEND_URL}")
