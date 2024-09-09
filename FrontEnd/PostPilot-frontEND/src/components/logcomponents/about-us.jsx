@@ -1,49 +1,54 @@
-import React, { useState } from 'react';
-import './about-us.css'; // Ensure this path is correct
+import React, { useState, useRef, useEffect } from 'react';
 
 const AboutUsModal = ({ buttonText, title, children }) => {
-    const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const modalRef = useRef();
 
-    const openModal = () => {
-        setIsOpen(true);
+  const openModal = () => {
+    setIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        closeModal();
+      }
     };
 
-    const closeModal = () => {
-        setIsOpen(false);
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
     };
+  }, [isOpen]);
 
-    const handleClickOutside = (e) => {
-        // Check if the click is outside the modal content
-        if (e.target.classList.contains('modal-overlay')) {
-            closeModal();
-        }
-    };
-
-    return (
-        <div>
-            <button
-                onClick={openModal}
-                className="modal-button"
-            >
-                {buttonText}
-            </button>
-
-            {isOpen && (
-                <div
-                    className="modal-overlay"
-                    onClick={handleClickOutside} // Handle click outside to close modal
-                >
-                    <div
-                        className="modal-content"
-                        onClick={e => e.stopPropagation()} // Prevent click inside from closing the modal
-                    >
-                        <h2 className="text-2xl font-semibold mb-4">{title}</h2>
-                        <div className="text-gray-700">{children}</div>
-                    </div>
-                </div>
-            )}
+  return (
+    <div>
+      <button
+        onClick={openModal}
+        className="rounded-full bg-white px-4 py-1 text-sm font-semibold shadow-md transition-all duration-300 hover:bg-gray-400 md:px-6 md:py-2 md:text-lg"
+      >
+        {buttonText}
+      </button>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div
+            ref={modalRef}
+            className="w-4/5 max-w-2xl rounded-lg bg-white p-4 shadow-md md:p-8"
+          >
+            <h2 className="mb-4 text-2xl font-semibold justify-center flex">{title}</h2>
+            <div class="text-gray-600 space-y-4 leading-relaxed">{children}</div>
+          </div>
         </div>
-    );
+      )}
+    </div>
+  );
 };
 
 export default AboutUsModal;
