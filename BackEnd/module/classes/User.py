@@ -3,17 +3,18 @@ from dotenv import load_dotenv
 from MongoDB_pool import MongoDBPool
 from bson import ObjectId
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import logging
 import requests
 import hashlib
+import pytz
 
 class User:
     def __init__(self):
         self._load_environment()
         self._connect_to_database()
         logging.basicConfig(level=logging.INFO)
-        self.BASE_URL = "https://c961-79-19-108-131.ngrok-free.app//api/img/"
+        self.BASE_URL = "https://67fc-87-3-102-188.ngrok-free.app/api/img/"
 
     def _load_environment(self):
         load_dotenv()
@@ -78,6 +79,8 @@ class User:
     def get_user(self, user_id):
         user = self.users_collection.find_one({"_id": ObjectId(user_id)})
         if user:
+            # Ensure connected_account is always a list
+            user['connected_account'] = user.get('connected_account', [])
             return user
         return None
 
@@ -138,17 +141,32 @@ class User:
             return f"Error updating token: {str(e)}"
 
     def get_pending_posts(self, user_id):
-        return list(self.posts_collection.find({
+        posts = list(self.posts_collection.find({
             "user_id": ObjectId(user_id),
             "status": "scheduled"
         }))
+        # Convert ObjectId to string for JSON serialization
+        for post in posts:
+            post['_id'] = str(post['_id'])
+            post['user_id'] = str(post['user_id'])
+        return posts
 
     def save_scheduled_post(self, post_data):
+        # Ensure scheduled_time is timezone-aware
+        if 'scheduled_time' in post_data:
+            if isinstance(post_data['scheduled_time'], str):
+                post_data['scheduled_time'] = datetime.fromisoformat(post_data['scheduled_time'].replace('Z', '+00:00')).replace(tzinfo=timezone.utc)
+            elif isinstance(post_data['scheduled_time'], datetime) and post_data['scheduled_time'].tzinfo is None:
+                post_data['scheduled_time'] = post_data['scheduled_time'].replace(tzinfo=timezone.utc)
+
         result = self.posts_collection.insert_one(post_data)
         return result.inserted_id
 
     def get_scheduled_post(self, post_id):
-        return self.posts_collection.find_one({"_id": ObjectId(post_id)})
+        post = self.posts_collection.find_one({"_id": ObjectId(post_id)})
+        if post:
+            post['scheduled_time'] = self._ensure_timezone_aware(post['scheduled_time'])
+        return post
 
     def update_post_status(self, post_id, new_status):
         return self.posts_collection.update_one(
@@ -158,20 +176,40 @@ class User:
 
     def is_token_valid(self, user):
         token_expiry = user.get("instagram_token_expiry")
-        if token_expiry and datetime.now() < token_expiry:
-            return True
+        if token_expiry:
+            token_expiry = self._ensure_timezone_aware(token_expiry)
+            return datetime.now(timezone.utc) < token_expiry
         return False
 
     def get_scheduled_posts_ready(self, current_time):
-        return list(self.posts_collection.find({
-            "scheduled_time": {"$lte": current_time},
-            "status": "scheduled"
-        }))
+        current_time = self._ensure_timezone_aware(current_time)
+        all_posts = list(self.posts_collection.find({"status": "scheduled"}))
+        ready_posts = []
+        
+        logging.info(f"Current time (UTC): {current_time}")
+        logging.info(f"Total scheduled posts: {len(all_posts)}")
+        
+        for post in all_posts:
+            post_time = self._ensure_timezone_aware(post['scheduled_time'])
+            
+            logging.info(f"Post ID: {post['_id']}, Scheduled time (UTC): {post_time}, Current time (UTC): {current_time}")
+            
+            if post_time <= current_time:
+                ready_posts.append(post)
+                logging.info(f"Post is ready to be published")
+            else:
+                logging.info(f"Post is not yet ready to be published")
+        
+        logging.info(f"Posts ready to be published: {len(ready_posts)}")
+        return ready_posts
 
     def publish_post(self, post_id):
         post = self.get_scheduled_post(post_id)
         if not post:
             return "Post not found."
+
+        if post['status'] == 'published':
+            return "Post has already been published."
 
         user = self.get_user(post['user_id'])
         if not user:
@@ -179,6 +217,13 @@ class User:
 
         if not self.is_token_valid(user):
             return "Instagram token is invalid or expired."
+
+        scheduled_time = self._ensure_timezone_aware(post['scheduled_time'])
+        current_time = datetime.now(timezone.utc)
+        logging.info(f"Current time (UTC): {current_time}, Scheduled time (UTC): {scheduled_time}")
+
+        if current_time < scheduled_time:
+            return f"Post is scheduled for future publication at {scheduled_time.isoformat()}"
 
         # Step 1: Create Media Container
         container_id = self._create_media_container(user, post)
@@ -269,7 +314,7 @@ class User:
             return None
 
     def process_scheduled_posts(self):
-        current_time = datetime.now()
+        current_time = datetime.now(timezone.utc)
         ready_posts = self.get_scheduled_posts_ready(current_time)
 
         for post in ready_posts:
@@ -304,3 +349,13 @@ class User:
             return "Password changed successfully."
         else:
             return "Failed to change password."
+
+    def _ensure_timezone_aware(self, dt):
+        if isinstance(dt, str):
+            dt = datetime.fromisoformat(dt.replace('Z', '+00:00'))
+        if isinstance(dt, datetime):
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            else:
+                dt = dt.astimezone(timezone.utc)
+        return dt

@@ -166,6 +166,31 @@ def logout():
     logger.debug("User logged out")
     return jsonify({"message": "Logged out successfully"}), 200
 
+@auth_bp.route('/api/connected_accounts', methods=['GET'])
+def get_connected_accounts():
+    user_id = session.get('user_id')
+    logger.debug(f"Fetching connected accounts for user ID: {user_id}")
+    
+    if not user_id:
+        logger.info("No user ID found in session")
+        return jsonify({"error": "User not authenticated"}), 401
+    
+    try:
+        user = user_manager.get_user(ObjectId(user_id))
+        logger.debug(f"User from database: {user}")
+        
+        if user:
+            connected_accounts = user.get('connected_account', [])
+            logger.debug(f"Connected accounts: {connected_accounts}")
+            return jsonify({"connected_accounts": connected_accounts}), 200
+        else:
+            logger.warning(f"User ID {user_id} not found in database")
+            return jsonify({"error": "User not found"}), 404
+    
+    except Exception as e:
+        logger.error(f"Error retrieving connected accounts: {str(e)}")
+        return jsonify({"error": "Error retrieving connected accounts"}), 500
+
 def is_valid_email(email):
     # Basic email validation
     pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'

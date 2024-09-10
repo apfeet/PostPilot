@@ -1,12 +1,16 @@
 # File: app.py
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask.sessions import SessionInterface, SessionMixin
 from flask_cors import CORS
 from bson import ObjectId
-from datetime import timedelta
+from datetime import timedelta, timezone
 import os
 from MongoDB_pool import MongoDBPool
+import logging
+from module.routes.task import background_scheduler
+import threading
+import pytz
 
 class MongoDBSession(dict, SessionMixin):
     def __init__(self, initial=None, sid=None):
@@ -59,6 +63,7 @@ class MongoDBSessionInterface(SessionInterface):
 
 # Initialize Flask app
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": ["http://localhost:8080"], "supports_credentials": True}})
 
 # Get HOST and PORT from environment variables or use defaults
 HOST = os.environ.get('HOST', 'localhost')
@@ -105,11 +110,18 @@ from module.routes.task import task_bp  # Import the task blueprint
 app.register_blueprint(auth_bp)
 app.register_blueprint(instagram_bp)
 app.register_blueprint(misc_blueprint)
-app.register_blueprint(task_bp)  # Register the task blueprint
+app.register_blueprint(task_bp)  
 
+# Imposta il fuso orario di Roma
+app.config['TIMEZONE'] = pytz.timezone('Europe/Rome')
 
 if __name__ == '__main__':
     print(f"Frontend URL: {FRONTEND_URL}")
     print(f"Backend URL: {BACKEND_URL}")
     print(f"Nginx URL: {NGINX_URL}")
+    
+    # Start the background scheduler in a separate thread
+    scheduler_thread = threading.Thread(target=background_scheduler, daemon=True)
+    scheduler_thread.start()
+    
     app.run(host='0.0.0.0', port=int(BACKEND_PORT), debug=True)

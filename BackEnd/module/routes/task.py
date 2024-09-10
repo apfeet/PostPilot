@@ -2,12 +2,13 @@ import os
 import logging
 from flask import Blueprint, request, jsonify, session, send_from_directory, abort
 from bson import ObjectId
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from werkzeug.utils import secure_filename
 from PIL import Image
 from ..classes.User import User
 import time
 from threading import Thread
+import pytz
 
 task_bp = Blueprint('task', __name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -132,40 +133,62 @@ def schedule_post():
 
         media_type = request.form.get('media_type')
         caption = request.form.get('caption')
-        scheduled_time = request.form.get('scheduled_time')
+        scheduled_time_str = request.form.get('scheduled_time')
+        user_timezone = request.form.get('timezone', 'UTC')
 
-        if not media_type or not scheduled_time:
+        if not media_type or not scheduled_time_str:
             return jsonify({'error': 'Media type and scheduled time are required.'}), 400
 
-        user = user_manager.get_user(user_id)
-        if user is None:
-            return jsonify({'error': 'User not found.'}), 404
+        # Parse the scheduled time
+        try:
+            user_tz = pytz.timezone(user_timezone)
+            scheduled_time = user_manager._ensure_timezone_aware(scheduled_time_str)
+            scheduled_time_user = scheduled_time.astimezone(user_tz)
+            
+            logging.info(f"Received scheduled time (UTC): {scheduled_time}")
+            logging.info(f"Converted scheduled time (User TZ): {scheduled_time_user}")
 
-        plan = user.get('plan', 'default')
-        if plan == 'default':
-            pending_posts = user_manager.get_pending_posts(user_id)
-            if len(pending_posts) > 0:
-                return jsonify({'error': 'Default plan users can only schedule one post at a time.'}), 403
+            user = user_manager.get_user(user_id)
+            if user is None:
+                return jsonify({'error': 'User not found.'}), 404
 
-        media_file = request.files['media']
-        filename = save_media_to_storage(media_file, media_type)
-        if filename is None:
-            return jsonify({'error': 'Failed to save media file'}), 500
+            plan = user.get('plan', 'default')
+            if plan == 'default':
+                pending_posts = user_manager.get_pending_posts(user_id)
+                if len(pending_posts) > 0:
+                    return jsonify({'error': 'Default plan users can only schedule one post at a time.'}), 403
 
-        post_data = {
-            'user_id': ObjectId(user_id),
-            'media_type': media_type,
-            'caption': caption,
-            'media_path': filename,  # Store only the filename
-            'scheduled_time': datetime.fromisoformat(scheduled_time),
-            'status': 'scheduled'
-        }
-        post_id = user_manager.save_scheduled_post(post_data)
+            media_file = request.files['media']
+            filename = save_media_to_storage(media_file, media_type)
+            if filename is None:
+                return jsonify({'error': 'Failed to save media file'}), 500
 
-        return jsonify({'message': 'Post scheduled successfully', 'post_id': str(post_id)})
+            post_data = {
+                'user_id': ObjectId(user_id),
+                'media_type': media_type,
+                'caption': caption,
+                'media_path': filename,
+                'scheduled_time': scheduled_time,
+                'scheduled_time_user': scheduled_time_user.isoformat(),
+                'user_timezone': user_timezone,
+                'status': 'scheduled'
+            }
+            post_id = user_manager.save_scheduled_post(post_data)
+
+            logging.info(f"Post scheduled successfully. ID: {post_id}, Scheduled time (UTC): {scheduled_time}")
+
+            return jsonify({
+                'message': 'Post scheduled successfully', 
+                'post_id': str(post_id),
+                'scheduled_time': scheduled_time.isoformat(),
+                'scheduled_time_user': scheduled_time_user.isoformat()
+            })
+
+        except ValueError as ve:
+            return jsonify({'error': f'Invalid date format: {str(ve)}'}), 400
 
     except Exception as e:
-        logging.error(f"Error in schedule_post: {e}")
+        logging.error(f"Error in schedule_post: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @task_bp.route('/api/instagram/get_pending_posts', methods=['GET'])
@@ -176,10 +199,18 @@ def get_pending_posts():
             return jsonify({'error': 'Invalid or missing user_id. Please log in again.'}), 401
 
         pending_posts = user_manager.get_pending_posts(user_id)
+        
+        for post in pending_posts:
+            utc_time = post['scheduled_time']
+            user_tz = pytz.timezone(post.get('user_timezone', 'UTC'))
+            user_time = utc_time.astimezone(user_tz)
+            post['scheduled_time_user'] = user_time.isoformat()
+            post['scheduled_time'] = utc_time.isoformat()
+
         return jsonify({'pending_posts': pending_posts})
 
     except Exception as e:
-        logging.error(f"Error in get_pending_posts: {e}")
+        logging.error(f"Error in get_pending_posts: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @task_bp.route('/api/instagram/cancel_post/<post_id>', methods=['POST'])
@@ -208,15 +239,18 @@ def background_scheduler():
     logging.info("Starting background scheduler...")
     while True:
         try:
-            now = datetime.now()
-            scheduled_posts = user_manager.get_scheduled_posts_ready(now)
-            logging.debug(f"Found {len(scheduled_posts)} posts ready to be published.")
+            now_utc = datetime.now(timezone.utc)
+            logging.info(f"Current time (UTC): {now_utc}")
+            scheduled_posts = user_manager.get_scheduled_posts_ready(now_utc)
+            logging.info(f"Found {len(scheduled_posts)} posts ready to be published.")
             
             for post in scheduled_posts:
-                logging.info(f"Scheduling post with ID: {post['_id']}")
-                schedule_instagram_post(str(post['_id']))
+                logging.info(f"Post details: {post}")
+                logging.info(f"Publishing post with ID: {post['_id']}, scheduled for: {post['scheduled_time']}")
+                result = schedule_instagram_post(str(post['_id']))
+                logging.info(f"Result of publishing post {post['_id']}: {result}")
             
-            time.sleep(60)
+            time.sleep(10)  # Check every minute
         except Exception as e:
             logging.error(f"Error in background_scheduler: {e}")
 
@@ -227,9 +261,18 @@ def schedule_instagram_post(post_id):
             logging.error(f"Scheduled post {post_id} not found.")
             return
 
+        # Check if the post is already published or in progress
+        if post['status'] not in ['scheduled', 'failed']:
+            logging.info(f"Post {post_id} is already {post['status']}. Skipping.")
+            return
+
+        # Set the post status to 'in_progress' to prevent double posting
+        user_manager.update_post_status(post_id, 'in_progress')
+
         user = user_manager.get_user(post['user_id'])
         if not user:
             logging.error(f"User {post['user_id']} not found for post {post_id}.")
+            user_manager.update_post_status(post_id, 'failed')
             return
 
         if not user_manager.is_token_valid(user):
@@ -237,11 +280,26 @@ def schedule_instagram_post(post_id):
             user_manager.update_post_status(post_id, 'failed')
             return
 
+        # Ensure the scheduled_time is timezone-aware
+        scheduled_time = post['scheduled_time']
+        if isinstance(scheduled_time, str):
+            scheduled_time = datetime.fromisoformat(scheduled_time.replace('Z', '+00:00')).replace(tzinfo=timezone.utc)
+        elif isinstance(scheduled_time, datetime) and scheduled_time.tzinfo is None:
+            scheduled_time = scheduled_time.replace(tzinfo=timezone.utc)
+
+        current_time = datetime.now(timezone.utc)
+        logging.info(f"Current time (UTC): {current_time}, Scheduled time (UTC): {scheduled_time}")
+
+        if current_time < scheduled_time:
+            logging.info(f"Post {post_id} is not yet due for publishing.")
+            user_manager.update_post_status(post_id, 'scheduled')  # Reset status
+            return
+
         logging.info(f"Publishing post {post_id} for user {user['username']}...")
         result = user_manager.publish_post(post_id)
         logging.info(f"Post {post_id} publishing result: {result}")
 
-        if "Post published successfully" in result:
+        if isinstance(result, str) and "Post published successfully" in result:
             user_manager.update_post_status(post_id, 'published')
             logging.info(f"Post {post_id} marked as published.")
 
@@ -259,8 +317,10 @@ def schedule_instagram_post(post_id):
             logging.error(f"Failed to publish post {post_id}: {result}")
 
     except Exception as e:
-        logging.error(f"Error in schedule_instagram_post: {e}")
+        logging.error(f"Error in schedule_instagram_post: {e}", exc_info=True)
         user_manager.update_post_status(post_id, 'failed')
+
+
 
 # Start the background scheduler thread
 scheduler_thread = Thread(target=background_scheduler, daemon=True)
