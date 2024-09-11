@@ -6,7 +6,6 @@ import os
 from datetime import datetime, timedelta, timezone
 import logging
 import requests
-import hashlib
 import pytz
 
 class User:
@@ -14,7 +13,7 @@ class User:
         self._load_environment()
         self._connect_to_database()
         logging.basicConfig(level=logging.INFO)
-        self.BASE_URL = "https://67fc-87-3-102-188.ngrok-free.app/api/img/"
+        self.BASE_URL = "https://6405-87-3-102-188.ngrok-free.app/api/img/"
 
     def _load_environment(self):
         load_dotenv()
@@ -36,11 +35,10 @@ class User:
         if password_check is not True:
             return password_check
 
-        hashed_password = self._hash_password(password)
         user_data = {
             "username": username,
             "email": email,
-            "password": hashed_password,
+            "password": password,
             "connected_account": [],
             "plan": plan,
             "created_at": datetime.now()
@@ -65,9 +63,6 @@ class User:
         if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
             return "Password must contain at least one special character."
         return True
-
-    def _hash_password(self, password):
-        return hashlib.sha256(password.encode()).hexdigest()
 
     def delete_user(self, username):
         result = self.users_collection.delete_one({"username": username})
@@ -323,7 +318,7 @@ class User:
 
     def authenticate_user(self, username, password):
         user = self.users_collection.find_one({"username": username})
-        if user and user['password'] == self._hash_password(password):
+        if user and user['password'] == password:
             return user
         return None
 
@@ -332,17 +327,16 @@ class User:
         if not user:
             return "User not found."
 
-        if user['password'] != self._hash_password(old_password):
+        if user['password'] != old_password:
             return "Incorrect old password."
 
         password_check = self._check_password_integrity(new_password, new_password)
         if password_check is not True:
             return password_check
 
-        hashed_new_password = self._hash_password(new_password)
         result = self.users_collection.update_one(
             {"_id": ObjectId(user_id)},
-            {"$set": {"password": hashed_new_password}}
+            {"$set": {"password": new_password}}
         )
 
         if result.modified_count > 0:

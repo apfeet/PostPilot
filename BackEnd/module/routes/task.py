@@ -250,7 +250,7 @@ def background_scheduler():
                 result = schedule_instagram_post(str(post['_id']))
                 logging.info(f"Result of publishing post {post['_id']}: {result}")
             
-            time.sleep(10)  # Check every minute
+            time.sleep(60)  # Check every minute
         except Exception as e:
             logging.error(f"Error in background_scheduler: {e}")
 

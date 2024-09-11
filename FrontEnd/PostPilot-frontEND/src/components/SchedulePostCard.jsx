@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 
-const SchedulePostCard = ({ onSchedule, connectedAccounts }) => {
+const SchedulePostCard = ({ onSchedule, connectedAccounts = [] }) => {
   const cardRef = useRef(null);
 
   useEffect(() => {
@@ -16,7 +16,7 @@ const SchedulePostCard = ({ onSchedule, connectedAccounts }) => {
   );
 };
 
-const SchedulePostForm = ({ onSchedule, connectedAccounts }) => {
+const SchedulePostForm = ({ onSchedule, connectedAccounts = [] }) => {
   const [content, setContent] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
@@ -101,16 +101,20 @@ const SchedulePostForm = ({ onSchedule, connectedAccounts }) => {
           className="p-2 bg-slate-600 text-white rounded w-full sm:w-auto"
         />
       </div>
-      <select
-        value=""
-        onChange={(e) => setSelectedPlatforms([...selectedPlatforms, e.target.value])}
-        className="w-full p-2 bg-slate-600 text-white rounded"
-      >
-        <option value="" disabled>Select platforms</option>
-        {connectedAccounts.map((account) => (
-          <option key={account} value={account}>{account}</option>
-        ))}
-      </select>
+      {connectedAccounts.length > 0 ? (
+        <select
+          value=""
+          onChange={(e) => setSelectedPlatforms([...selectedPlatforms, e.target.value])}
+          className="w-full p-2 bg-slate-600 text-white rounded"
+        >
+          <option value="" disabled>Select platforms</option>
+          {connectedAccounts.map((account) => (
+            <option key={account} value={account}>{account}</option>
+          ))}
+        </select>
+      ) : (
+        <p className="text-white">No connected accounts available. Please connect an account first.</p>
+      )}
       <div className="flex flex-wrap gap-2">
         {selectedPlatforms.map((platform) => (
           <button

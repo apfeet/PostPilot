@@ -2,11 +2,28 @@ import React, { useState, useEffect } from 'react';
 import SocialPlatforms from "./SocialPlatforms";
 import SchedulePostCard from "./SchedulePostCard";
 import ScheduledPostsCard from "./ScheduledPostsCard";
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const HomeView = ({ userInfo }) => {
   const [connectedAccounts, setConnectedAccounts] = useState([]);
   const [scheduledPosts, setScheduledPosts] = useState([]);
   const [error, setError] = useState(null);
+  const [openSections, setOpenSections] = useState(() => {
+    const savedState = localStorage.getItem('openSections');
+    return savedState ? JSON.parse(savedState) : {
+      accounts: false,
+      schedule: false,
+      scheduledPosts: false,
+    };
+  });
+
+  const toggleSection = (section) => {
+    setOpenSections(prev => {
+      const newState = { ...prev, [section]: !prev[section] };
+      localStorage.setItem('openSections', JSON.stringify(newState));
+      return newState;
+    });
+  };
 
   useEffect(() => {
     fetchConnectedAccounts();
@@ -149,14 +166,58 @@ const HomeView = ({ userInfo }) => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white">Welcome, {userInfo.username}</h2>
-      {error && <p className="text-red-500">{error}</p>}
-      <SocialPlatforms
-        connectedAccounts={connectedAccounts}
-        onConnect={handleConnect}
-      />
-      <SchedulePostCard onSchedule={handleSchedulePost} connectedAccounts={connectedAccounts} />
-      <ScheduledPostsCard posts={scheduledPosts} />
+      <h1 className="text-3xl font-bold text-white mb-6">Welcome, {userInfo.username}!</h1>
+
+      {/* Connect Your Accounts Section */}
+      <div className="bg-slate-800 rounded-lg p-4">
+        <button
+          className="flex justify-between items-center w-full text-white text-xl font-semibold"
+          onClick={() => toggleSection('accounts')}
+        >
+          Connect Your Accounts
+          {openSections.accounts ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+        </button>
+        {openSections.accounts && (
+          <div className="mt-4">
+            <SocialPlatforms
+              connectedAccounts={connectedAccounts}
+              onConnect={handleConnect}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Schedule a Post Section */}
+      <div className="bg-slate-800 rounded-lg p-4">
+        <button
+          className="flex justify-between items-center w-full text-white text-xl font-semibold"
+          onClick={() => toggleSection('schedule')}
+        >
+          Schedule a Post
+          {openSections.schedule ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+        </button>
+        {openSections.schedule && (
+          <div className="mt-4">
+            <SchedulePostCard onSchedule={handleSchedulePost} connectedAccounts={connectedAccounts} />
+          </div>
+        )}
+      </div>
+
+      {/* Scheduled Posts Section */}
+      <div className="bg-slate-800 rounded-lg p-4">
+        <button
+          className="flex justify-between items-center w-full text-white text-xl font-semibold"
+          onClick={() => toggleSection('scheduledPosts')}
+        >
+          Scheduled Posts
+          {openSections.scheduledPosts ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+        </button>
+        {openSections.scheduledPosts && (
+          <div className="mt-4">
+            <ScheduledPostsCard posts={scheduledPosts} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

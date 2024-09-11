@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify, session, current_app
-from werkzeug.security import generate_password_hash, check_password_hash
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from module.classes.User import User
@@ -49,8 +48,7 @@ def google_login():
             return jsonify({"message": "Login successful", "username": existing_user.get('username', email)}), 200
         else:
             # Register the user
-            hashed_password = generate_password_hash(token)  # Generate a password from token
-            result = user_manager.create_user(username, email, hashed_password)
+            result = user_manager.create_user(username, email, token)  # Save token as password without hashing
 
             if result == "User created successfully.":
                 new_user = user_manager.users_collection.find_one({"email": email})
@@ -80,7 +78,7 @@ def register_login():
 
     if existing_user:
         # Login
-        if check_password_hash(existing_user['password'], password):
+        if existing_user['password'] == password:  # Compare passwords directly
             save_session(existing_user['_id'])
             return jsonify({"message": "Login successful", "username": existing_user['username']}), 200
         else:
@@ -97,10 +95,7 @@ def register_login():
         # Generate a username from the email
         username = email.split('@')[0]
 
-        # Hash the password before storing
-        hashed_password = generate_password_hash(password)
-
-        result = user_manager.create_user(username, email, hashed_password)
+        result = user_manager.create_user(username, email, password)  # Save password without hashing
 
         if result == "User created successfully.":
             new_user = user_manager.users_collection.find_one({"email": email})
