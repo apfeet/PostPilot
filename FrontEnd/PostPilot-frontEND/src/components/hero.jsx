@@ -34,16 +34,16 @@ const useAnimations = () => {
       },
     });
 
-    tl.fromTo(".event-card", 
+    tl.fromTo(".event-card",
       { y: 100, opacity: 0 },
       { y: 0, opacity: 1, stagger: 0.2, duration: 1 }
     );
 
     gsap.fromTo(".info-box",
       { y: 50, opacity: 0 },
-      { 
-        y: 0, 
-        opacity: 1, 
+      {
+        y: 0,
+        opacity: 1,
         duration: 1,
         scrollTrigger: {
           trigger: ".info-box",
@@ -61,8 +61,8 @@ const Header = () => (
     <img src={logo} alt="PostPilot" className="w-16 h-14 md:w-18 md:h-16 rounded-md" />
     <AboutUsModal buttonText="About Us" title="About PostPilot">
       <p>Welcome to PostPilot! We're a dynamic duo passionate about simplifying social media management. Our mission is to help you seamlessly schedule posts across Instagram, Facebook, Snapchat, and more.</p>
-      <p>At PostPilot, we understand the demands of managing multiple accounts. That's why we've built a platform to streamline your workflow, save you time, and boost your online presence.</p>
-      <p>Join us as we make social media scheduling easier and more efficient. Together, we'll take your online presence to new heights!</p>
+      <p>At PostPilot, we understand the demands of managing multiple accounts. That's why we've built a platform to <span className="text-teal-400">streamline your workflow</span>, save you time, and boost your online presence.</p>
+      <p>Join us as we make social media scheduling <span className="text-coral-400">easier and more efficient</span>. Together, we'll take your online presence to new heights!</p>
     </AboutUsModal>
   </header>
 );
@@ -79,7 +79,7 @@ const HeroSection = () => {
         <span className="ml-2 font-semibold text-teal-400">POST</span>
         <span className="ml-2 text-white opacity-40">on </span>
         <br className="md:hidden" />
-        <div style={{ height: '1.2em', overflow: 'hidden' ,marginLeft:"0.25em"}}> 
+        <div style={{ height: '1.2em', overflow: 'hidden', marginLeft: "0.25em" }}>
           <span className="font-semibold text-white opacity-40 ">
             <Typewriter
               words={words}
@@ -107,7 +107,7 @@ const FeatureSection = ({ onStartClick }) => (
       </h2>
     </section>
     <section className="mt-10 flex justify-center">
-      <button 
+      <button
         className="rounded-lg bg-white px-6 py-2 md:px-8 md:py-3 text-lg font-medium text-black shadow-lg transition duration-300 hover:bg-black hover:text-white"
         onClick={onStartClick}
       >
